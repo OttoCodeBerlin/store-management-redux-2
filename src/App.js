@@ -14,11 +14,12 @@ import Profile from '../src/pages/Profile'
 import ThankYou from '../src/pages/ThankYou'
 import CustomerImage from '../src/pages/CustomerImage'
 import About from '../src/pages/About'
+// import Navbar from './components/Navbar'
 
 // require('dotenv').config()
 
 let authenticated
-const token = localStorage.FirebaseIdToken
+const token = localStorage.FBIdToken
 if (token) {
   const decodedToken = jwtDecode(token)
   if (decodedToken.exp * 1000 < Date.now()) {
@@ -28,6 +29,8 @@ if (token) {
     authenticated = true
   }
 }
+
+console.log(authenticated)
 
 class App extends Component {
   render() {

@@ -46,7 +46,7 @@ export default class Signup extends Component {
       .post('/signup', newUserData)
       .then(res => {
         console.log(res.data)
-        localStorage.setItem('FirebaseIdToken', `Bearer ${res.data.token}`)
+        localStorage.setItem('FBIdToken', `Bearer ${res.data.token}`)
         this.props.history.push('/profile')
       })
       .catch(({ response: { data } }) => {

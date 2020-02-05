@@ -229,7 +229,7 @@ export default class CustomerImage extends Component {
         <div className="container mt-5">
           {/* View for large devices - Desktop */}
           <MediaQuery minDeviceWidth={1024}>
-            <div className="jumbotron" style={{ opacity: '0.9', marginLeft: '15vw', marginRight: '15vw' }}>
+            <div className="jumbotron" style={{ opacity: '1', marginLeft: '15vw', marginRight: '15vw' }}>
               <div className="container" style={{ textAlign: 'center' }}>
                 <h2 className="title" style={{ fontFamily: 'Permanent Marker, cursive' }}>
                   DEAR CUSTOMER
@@ -258,7 +258,7 @@ export default class CustomerImage extends Component {
                   width={448}
                   videoConstraints={videoConstraints}
                   className="rounded "
-                  style={{ border: '1px solid #6C757D' }}
+                  style={{ border: '1px solid #6C757D', opacity: '1' }}
                 />
               </div>
 

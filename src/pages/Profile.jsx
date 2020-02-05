@@ -28,19 +28,30 @@ export default class Profile extends Component {
 
   //Lifecycle method 1
   componentDidMount() {
-    axios
-      .get('/customers')
-      .then(res => {
-        console.log(res.data)
-        this.setState({
-          customers: res.data
-        })
-      })
-      .catch(({ response: { data } }) => {
-        this.setState({ message: data.message })
-      })
+    console.log('Did mount.')
+    // axios
+    //   .get('/user')
+    //   .then(res => {
+    //     console.log(res)
+    //     this.setState({
+    //       user: res.data
+    //     })
+    //   })
+    //   .catch(err => console.log(err))
 
-    // this.getCustomerDataFromDb()
+    // axios
+    //   .get('/customers')
+    //   .then(res => {
+    //     console.log(res)
+    //     this.setState({
+    //       customers: res.data
+    //     })
+    //   })
+    //   .catch(({ response: { data } }) => {
+    //     this.setState({ message: data.message })
+    //   })
+
+    this.getCustomerDataFromDb()
     // AuthService.loggedin()
     //   .then(({ data }) => {
     //     this.setState({ user: data })
@@ -62,12 +73,15 @@ export default class Profile extends Component {
   }
 
   //Get customers from database
-  // getCustomerDataFromDb=()=> {
-  //   fetch(process.env.REACT_APP_API_URL + '/auth/customers')
-  //   // fetch('http://localhost:5000/auth/customers')
-  //   .then((data)=> data.json())
-  //   .then((res)=> this.setState({customers: res.allCustomers}))
-  // }
+  getCustomerDataFromDb=()=> {
+    fetch('https://europe-west1-ocb-store-management.cloudfunctions.net/api/customers')
+    // fetch('http://localhost:5000/auth/customers')
+    .then((data)=> data.json())
+    .then((res)=> {
+      console.log(res)
+      this.setState({customers: res.allCustomers})
+    })
+  }
 
   //Delete a customer in database and update view
   deleteCustomer = (id, e) => {
@@ -181,7 +195,6 @@ export default class Profile extends Component {
     })
     this.setState({ filtered_customers })
   }
-
   //RENDER VIEW
   render() {
     let customer_group
