@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import Webcam from 'react-webcam'
-import { storage } from '../util/firebase-config'
+// import { storage } from '../util/firebase-config'
 import NavbarCustomer from '../components/NavbarCustomer'
 import FooterCustomer from '../components/FooterCustomer'
 import axios from 'axios'
@@ -16,9 +16,9 @@ export default class CustomerImage extends Component {
       first_name: '',
       last_name: '',
       email: '',
-      picture_one: null,
-      picture_two: null,
-      customer_id: this.props.match.params.id,
+      customerImage_1: null,
+      customerImage_2: null,
+      customerId: this.props.match.params.id,
       message: null,
       imageData_one: '',
       imageData_two: '',
@@ -43,28 +43,36 @@ export default class CustomerImage extends Component {
   }
 
   //Write first picture in database
-  memoryDataOne = id => {
-    let memory = this.state
-    memory.picture_one = id
-    // AuthService.modify_customer(memory)
-    //   .then(({customer}) => {
-    //   })
-    //   .catch(({ response: { data } }) => {
-    //     this.setState({ message: data.message })
-    //   })
-  }
+  // memoryDataOne = id => {
+  //   let memory = this.state
+  //   memory.picture_one = id
+  //   axios
+  //   .post('/customer/'+ this.state.customerId +'/image1', )
+  //     .then(({customer}) => {
+  //     })
+  //     .catch(({ response: { data } }) => {
+  //       this.setState({ message: data.message })
+  //     })
+  // }
 
   //Write second picture in database
-  memoryDataTwo = id => {
-    let memory = this.state
-    memory.picture_two = id
-    // AuthService.modify_customer(memory)
-    // .then(({customer}) => {
-    // })
-    // .catch(({ response: { data } }) => {
-    //   this.setState({ message: data.message })
-    // })
-  }
+  // memoryDataTwo = id => {
+  //   let memory = this.state
+  //   memory.picture_two = id
+  //   axios
+  //   .post('/customer/'+ this.state.customerId +'/image2', )
+  //     .then(({customer}) => {
+  //     })
+  //     .catch(({ response: { data } }) => {
+  //       this.setState({ message: data.message })
+  //     })
+  // AuthService.modify_customer(memory)
+  // .then(({customer}) => {
+  // })
+  // .catch(({ response: { data } }) => {
+  //   this.setState({ message: data.message })
+  // })
+  // }
 
   //Take first shot
   capture_one = () => {
@@ -100,14 +108,45 @@ export default class CustomerImage extends Component {
     }
 
     let img_one = dataURLtoFile(this.state.imageData_one, this.state.image_name + '1.jpg')
+    let formData1 = new FormData()
+    formData1.append('image1', img_one)
     let img_two = dataURLtoFile(this.state.imageData_two, this.state.image_name + '2.jpg')
-    this.uploadImage_one(img_one)
-    this.uploadImage_two(img_two)
+    let formData2 = new FormData()
+    formData2.append('image2', img_two)
+    console.log(img_one)
+    axios
+      .post(process.env.REACT_APP_API_URL + '/customer/' + this.state.customerId + '/image1', formData1, {
+        headers: {
+          'Content-Type': 'multipart/form-data'
+        }
+      })
+      .then(({ customer }) => {})
+      .catch(({ response: { data } }) => {
+        this.setState({ message: data.message })
+      })
+
+    axios
+      .post(process.env.REACT_APP_API_URL + '/customer/' + this.state.customerId + '/image2', formData2, {
+        headers: {
+          'Content-Type': 'multipart/form-data'
+        }
+      })
+      .then(({ customer }) => {})
+      .catch(({ response: { data } }) => {
+        this.setState({ message: data.message })
+      })
+
+    // this.uploadImage_one(img_one)
+    // this.uploadImage_two(img_two)
 
     //Customer information change handler
     setTimeout(
       () =>
-        axios.modify_customer(this.state)
+        axios
+          .post(process.env.REACT_APP_API_URL + '/customer/' + this.state.customerId, {
+            first_name: this.state.first_name,
+            last_name: this.state.last_name
+          })
           .then(({ customer }) => {
             // localStorage.setItem('customerId', customer._id)
             this.props.history.push('/thankyou')
@@ -130,86 +169,86 @@ export default class CustomerImage extends Component {
   }
 
   //Upload image one
-  uploadImage_one(e) {
-    let imageObj = {}
-    let currentImageName = 'image-' + this.state.customer_id + '-' + Date.now()
-    let uploadImage = storage.ref(`images/${currentImageName}`).put(e)
+  // uploadImage_one(e) {
+  //   let imageObj = {}
+  //   let currentImageName = 'image-' + this.state.customer_id + '-' + Date.now()
+  //   let uploadImage = storage.ref(`images/${currentImageName}`).put(e)
 
-    uploadImage.on(
-      'state_changed',
-      snapshot => {},
-      error => {
-        alert(error)
-      },
-      () => {
-        storage
-          .ref('images')
-          .child(currentImageName)
-          .getDownloadURL()
-          .then(url => {
-            this.setState({
-              firebaseImage: url
-            })
+  //   uploadImage.on(
+  //     'state_changed',
+  //     snapshot => {},
+  //     error => {
+  //       alert(error)
+  //     },
+  //     () => {
+  //       storage
+  //         .ref('images')
+  //         .child(currentImageName)
+  //         .getDownloadURL()
+  //         .then(url => {
+  //           this.setState({
+  //             firebaseImage: url
+  //           })
 
-            // store image object in the database
-            imageObj = {
-              image_name: currentImageName,
-              image_data: url,
-              customerId: this.state.customer_id
-            }
-            axios
-              .modify_customer_image_one(imageObj)
-              .then(data => {
-                this.memoryDataOne(data.data._id)
-              })
-              .catch(err => {
-                alert('Error while uploading image using firebase storage')
-              })
-          })
-      }
-    )
-  }
+  //           // store image object in the database
+  //           imageObj = {
+  //             image_name: currentImageName,
+  //             image_data: url,
+  //             customerId: this.state.customer_id
+  //           }
+  //           axios
+  //             .modify_customer_image_one(imageObj)
+  //             .then(data => {
+  //               this.memoryDataOne(data.data._id)
+  //             })
+  //             .catch(err => {
+  //               alert('Error while uploading image using firebase storage')
+  //             })
+  //         })
+  //     }
+  //   )
+  // }
 
-  //Upload image 2
-  uploadImage_two(e) {
-    let imageObj = {}
-    let currentImageName = 'image-' + this.state.customer_id + '-' + Date.now()
-    let uploadImage = storage.ref(`images/${currentImageName}`).put(e)
+  // //Upload image 2
+  // uploadImage_two(e) {
+  //   let imageObj = {}
+  //   let currentImageName = 'image-' + this.state.customer_id + '-' + Date.now()
+  //   let uploadImage = storage.ref(`images/${currentImageName}`).put(e)
 
-    uploadImage.on(
-      'state_changed',
-      snapshot => {},
-      error => {
-        alert(error)
-      },
-      () => {
-        storage
-          .ref('images')
-          .child(currentImageName)
-          .getDownloadURL()
-          .then(url => {
-            this.setState({
-              firebaseImage: url
-            })
+  //   uploadImage.on(
+  //     'state_changed',
+  //     snapshot => {},
+  //     error => {
+  //       alert(error)
+  //     },
+  //     () => {
+  //       storage
+  //         .ref('images')
+  //         .child(currentImageName)
+  //         .getDownloadURL()
+  //         .then(url => {
+  //           this.setState({
+  //             firebaseImage: url
+  //           })
 
-            // store image object in the database
-            imageObj = {
-              image_name: currentImageName,
-              image_data: url,
-              customerId: this.state.customer_id
-            }
-            axios
-              .modify_customer_image_two(imageObj)
-              .then(data => {
-                this.memoryDataTwo(data.data._id)
-              })
-              .catch(err => {
-                alert('Error while uploading image using firebase storage')
-              })
-          })
-      }
-    )
-  }
+  //           // store image object in the database
+  //           imageObj = {
+  //             image_name: currentImageName,
+  //             image_data: url,
+  //             customerId: this.state.customer_id
+  //           }
+  //           axios
+  //             .modify_customer_image_two(imageObj)
+  //             .then(data => {
+  //               this.memoryDataTwo(data.data._id)
+  //             })
+  //             .catch(err => {
+  //               alert('Error while uploading image using firebase storage')
+  //             })
+  //         })
+  //     }
+  //   )
+  // }
 
   //RENDER PAGE
   render() {

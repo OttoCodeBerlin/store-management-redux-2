@@ -59,7 +59,7 @@ export default class Profile extends Component {
       .catch(({ response: { data } }) => {
         this.setState({ message: data.message })
       })
-      console.log(this.state)
+    console.log(this.state)
   }
 
   //Lifecycle Method 2
@@ -134,11 +134,10 @@ export default class Profile extends Component {
 
   //Submit handler for customer email input
   handleSubmit = e => {
-
     if (e) e.preventDefault()
     console.log(this.state.customer_email)
     axios
-      .post(process.env.REACT_APP_API_URL + '/customer', {email: this.state.customer_email} )
+      .post(process.env.REACT_APP_API_URL + '/customer', { email: this.state.customer_email })
       .then(res => {
         alert('Added')
         this.resetForm()
@@ -342,7 +341,7 @@ export default class Profile extends Component {
     }
 
     //Message if login is not valid
-    // if (!user) return <p>{message}</p>
+    if (!user) return <p>{message}</p>
 
     return (
       //NAVBAR
