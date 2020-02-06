@@ -29,10 +29,10 @@ export default class Login extends Component {
     }
 
     axios
-      .post('/login', userData)
+      .post(process.env.REACT_APP_API_URL + '/login', userData)
       .then(res => {
-        console.log(res.data)
         localStorage.setItem('FBIdToken', `Bearer ${res.data.token}`)
+        axios.defaults.headers.common['Authorization']= `Bearer ${res.data.token}`
         this.props.history.push('/profile')
       })
       .catch(({ response: { data } }) => {

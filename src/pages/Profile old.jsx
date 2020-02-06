@@ -10,13 +10,7 @@ export default class Profile extends Component {
     super(props)
 
     this.state = {
-      user: {
-        handle: '',
-        store_location: '',
-        role: '',
-        email: '',
-        userId: ''
-      },
+      user: null,
       message: null,
       customer_email: '',
       customers: [],
@@ -34,32 +28,37 @@ export default class Profile extends Component {
 
   //Lifecycle method 1
   componentDidMount() {
-    axios
-      .get(process.env.REACT_APP_API_URL + '/user')
-      .then(res => {
-        this.setState({
-          user: res.data.credentials
-          // user.store_location: res.data.credentials.store_location,
-          // user.role: res.data.credentials.role,
-          // user.email: res.data.credentials.email,
-          // user.createdAt: res.data.credentials.createdAt,
-          // user.userId: res.data.credentials.userId,
-        })
-      })
-      .catch(err => console.log(err))
+    console.log('Did mount.')
+    // axios
+    //   .get('/user')
+    //   .then(res => {
+    //     console.log(res)
+    //     this.setState({
+    //       user: res.data
+    //     })
+    //   })
+    //   .catch(err => console.log(err))
 
-    axios
-      .get(process.env.REACT_APP_API_URL + '/customers')
-      .then(res => {
-        console.log(res.data)
-        this.setState({
-          customers: res.data
-        })
-      })
-      .catch(({ response: { data } }) => {
-        this.setState({ message: data.message })
-      })
-      console.log(this.state)
+    // axios
+    //   .get('/customers')
+    //   .then(res => {
+    //     console.log(res)
+    //     this.setState({
+    //       customers: res.data
+    //     })
+    //   })
+    //   .catch(({ response: { data } }) => {
+    //     this.setState({ message: data.message })
+    //   })
+
+    this.getCustomerDataFromDb()
+    // AuthService.loggedin()
+    //   .then(({ data }) => {
+    //     this.setState({ user: data })
+    //    })
+    //   .catch(({ response: { data } }) => {
+    //     this.setState({ message: data.message });
+    //   })
   }
 
   //Lifecycle Method 2
@@ -74,39 +73,29 @@ export default class Profile extends Component {
   }
 
   //Get customers from database
-  // getCustomerDataFromDb = () => {
-  //   // fetch('https://europe-west1-ocb-store-management.cloudfunctions.net/api/customers')
-  //   // // fetch('http://localhost:5000/auth/customers')
-  //   // .then((data)=> data.json())
-  //   // .then((res)=> {
-  //   //   console.log(res)
-  //   //   this.setState({customers: res.allCustomers})
-  //   // })
-  // }
+  getCustomerDataFromDb=()=> {
+    fetch('https://europe-west1-ocb-store-management.cloudfunctions.net/api/customers')
+    // fetch('http://localhost:5000/auth/customers')
+    .then((data)=> data.json())
+    .then((res)=> {
+      console.log(res)
+      this.setState({customers: res.allCustomers})
+    })
+  }
 
   //Delete a customer in database and update view
   deleteCustomer = (id, e) => {
     e.preventDefault()
-    axios.delete(process.env.REACT_APP_API_URL + '/customer/' + id).then(response => {
-      axios
-        .get(process.env.REACT_APP_API_URL + '/customers')
-        .then(res => {
-          this.setState({
-            customers: res.data
-          })
-        })
-        .catch(({ response: { data } }) => {
-          this.setState({ message: data.message })
-        })
-      //   fetch(process.env.REACT_APP_API_URL + '/auth/customers')
-      //   .then((data)=> data.json())
-      //   .then((res)=> this.setState({customers: res.allCustomers}))
-      //   this.props.history.push('/profile')
-      // })
-      // .catch(({ response: { data } }) => {
-      //   this.setState({ message: data.message })
-      // })
-    })
+    // AuthService.delete_customer(this.state, id)
+    //   .then(response => {
+    //     fetch(process.env.REACT_APP_API_URL + '/auth/customers')
+    //     .then((data)=> data.json())
+    //     .then((res)=> this.setState({customers: res.allCustomers}))
+    //     this.props.history.push('/profile')
+    //   })
+    //   .catch(({ response: { data } }) => {
+    //     this.setState({ message: data.message })
+    //   })
   }
 
   //Send reminder email to customer
@@ -134,22 +123,7 @@ export default class Profile extends Component {
 
   //Submit handler for customer email input
   handleSubmit = e => {
-
     if (e) e.preventDefault()
-    console.log(this.state.customer_email)
-    axios
-      .post(process.env.REACT_APP_API_URL + '/customer', {email: this.state.customer_email} )
-      .then(res => {
-        alert('Added')
-        this.resetForm()
-        // this.props.history.push('/profile')
-        // localStorage.setItem('FBIdToken', `Bearer ${res.data.token}`)
-        // axios.defaults.headers.common['Authorization']= `Bearer ${res.data.token}`
-        // this.props.history.push('/profile')
-      })
-      .catch(({ response: { data } }) => {
-        this.setState({ message: data.message })
-      })
     // AuthService.add_customer(this.state)
     //   .then(({user, customer_email}) => {
     //     alert('Added')
@@ -174,9 +148,7 @@ export default class Profile extends Component {
   //Auth logout method
   handleLogout = () => {
     // AuthService.logout()
-    localStorage.removeItem('FBIdToken')
-    delete axios.defaults.headers.common['Authorization']
-    this.props.history.push('/')
+    // this.props.history.push('/')
   }
 
   //View handler for Add Customer tab
@@ -256,7 +228,7 @@ export default class Profile extends Component {
             <small>{customer.email}</small>
           </td>
 
-          {customer.customerImage_1 !== 'tbd' ? ( //If customer pictures exist, show them with links to large view
+          {customer.picture_one ? ( //If customer pictures exist, show them with links to large view
             <td className="align-middle p-0">
               <span>
                 <ReactImageMagnify
@@ -265,10 +237,10 @@ export default class Profile extends Component {
                       alt: 'Customer Image One',
                       width: 128,
                       height: 96,
-                      src: customer.customerImage_1
+                      src: customer.picture_one.image_data
                     },
                     largeImage: {
-                      src: customer.customerImage_1,
+                      src: customer.picture_one.image_data,
                       width: 640,
                       height: 480,
                       enlargedImageContainerDimensions: { width: '200%', height: '200%' },
@@ -285,10 +257,10 @@ export default class Profile extends Component {
                       alt: 'Customer Image Two',
                       width: 128,
                       height: 96,
-                      src: customer.customerImage_2
+                      src: customer.picture_two.image_data
                     },
                     largeImage: {
-                      src: customer.customerImage_2,
+                      src: customer.picture_two.image_data,
                       width: 640,
                       height: 480,
                       enlargedImageContainerDimensions: { width: '200%', height: '200%' },
@@ -317,7 +289,7 @@ export default class Profile extends Component {
               type="button"
               onClick={e => {
                 if (window.confirm('You are going to delete the customer data. Are you sure?')) {
-                  this.deleteCustomer(customer.customerId, e)
+                  this.deleteCustomer(customer._id, e)
                 }
               }}
             >
@@ -342,7 +314,7 @@ export default class Profile extends Component {
     }
 
     //Message if login is not valid
-    // if (!user) return <p>{message}</p>
+    if (!user) return <p>{message}</p>
 
     return (
       //NAVBAR
@@ -474,7 +446,7 @@ export default class Profile extends Component {
                     </li>
                   </div>
                   <li className="list-group-item text-center">
-                    Username: <b>{user.handle}</b>
+                    Username: <b>{user.username}</b>
                   </li>
                   <li className="list-group-item text-center">
                     Store Location: <b>{user.store_location}</b>

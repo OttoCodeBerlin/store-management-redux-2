@@ -47,6 +47,7 @@ export default class Signup extends Component {
       .then(res => {
         console.log(res.data)
         localStorage.setItem('FBIdToken', `Bearer ${res.data.token}`)
+        axios.defaults.headers.common['Authorization']= `Bearer ${res.data.token}`
         this.props.history.push('/profile')
       })
       .catch(({ response: { data } }) => {
