@@ -23,7 +23,8 @@ export default class CustomerImage extends Component {
       imageData_one: '',
       imageData_two: '',
       image_name: 'default',
-      saveImage: false
+      saveImage: false,
+      loading: false
     }
 
     this.validator = new SimpleReactValidator()
@@ -41,38 +42,6 @@ export default class CustomerImage extends Component {
   setRef = webcam => {
     this.webcam = webcam
   }
-
-  //Write first picture in database
-  // memoryDataOne = id => {
-  //   let memory = this.state
-  //   memory.picture_one = id
-  //   axios
-  //   .post('/customer/'+ this.state.customerId +'/image1', )
-  //     .then(({customer}) => {
-  //     })
-  //     .catch(({ response: { data } }) => {
-  //       this.setState({ message: data.message })
-  //     })
-  // }
-
-  //Write second picture in database
-  // memoryDataTwo = id => {
-  //   let memory = this.state
-  //   memory.picture_two = id
-  //   axios
-  //   .post('/customer/'+ this.state.customerId +'/image2', )
-  //     .then(({customer}) => {
-  //     })
-  //     .catch(({ response: { data } }) => {
-  //       this.setState({ message: data.message })
-  //     })
-  // AuthService.modify_customer(memory)
-  // .then(({customer}) => {
-  // })
-  // .catch(({ response: { data } }) => {
-  //   this.setState({ message: data.message })
-  // })
-  // }
 
   //Take first shot
   capture_one = () => {
@@ -113,17 +82,6 @@ export default class CustomerImage extends Component {
     let img_two = dataURLtoFile(this.state.imageData_two, this.state.image_name + '2.jpg')
     let formData2 = new FormData()
     formData2.append('image2', img_two)
-    console.log(img_one)
-    axios
-      .post(process.env.REACT_APP_API_URL + '/customer/' + this.state.customerId + '/image1', formData1, {
-        headers: {
-          'Content-Type': 'multipart/form-data'
-        }
-      })
-      .then(({ customer }) => {})
-      .catch(({ response: { data } }) => {
-        this.setState({ message: data.message })
-      })
 
     axios
       .post(process.env.REACT_APP_API_URL + '/customer/' + this.state.customerId + '/image2', formData2, {
@@ -131,124 +89,60 @@ export default class CustomerImage extends Component {
           'Content-Type': 'multipart/form-data'
         }
       })
-      .then(({ customer }) => {})
+      .then(response => {
+        return axios.post(process.env.REACT_APP_API_URL + '/customer/' + this.state.customerId + '/image1', formData1, {
+          headers: {
+            'Content-Type': 'multipart/form-data'
+          }
+        })
+      })
+      .then(response => {
+        return axios.post(process.env.REACT_APP_API_URL + '/customer/' + this.state.customerId + '/image1', formData1, {
+          headers: {
+            'Content-Type': 'multipart/form-data'
+          }
+        })
+      })
+      .then(response => {
+        return axios.post(process.env.REACT_APP_API_URL + '/customer/' + this.state.customerId, {
+          first_name: this.state.first_name,
+          last_name: this.state.last_name,
+          email: this.state.email
+        })
+      })
+      .then(response => {
+        return axios.post(process.env.REACT_APP_API_URL + '/customer/' + this.state.customerId + '/image1', formData1, {
+          headers: {
+            'Content-Type': 'multipart/form-data'
+          }
+        })
+      })
+      .then(response => {
+        this.setState({ loading: false })
+        this.props.history.push('/thankyou')
+      })
+      .then(response => {
+        return axios.post(process.env.REACT_APP_API_URL + '/customer/' + this.state.customerId + '/image2', formData1, {
+          headers: {
+            'Content-Type': 'multipart/form-data'
+          }
+        })
+      })
       .catch(({ response: { data } }) => {
         this.setState({ message: data.message })
       })
-
-    // this.uploadImage_one(img_one)
-    // this.uploadImage_two(img_two)
-
-    //Customer information change handler
-    setTimeout(
-      () =>
-        axios
-          .post(process.env.REACT_APP_API_URL + '/customer/' + this.state.customerId, {
-            first_name: this.state.first_name,
-            last_name: this.state.last_name
-          })
-          .then(({ customer }) => {
-            // localStorage.setItem('customerId', customer._id)
-            this.props.history.push('/thankyou')
-          })
-          .catch(({ response: { data } }) => {
-            this.setState({ message: data.message })
-          }),
-      1000
-    )
   }
 
   //Call final submit
   submitForm = e => {
     if (this.validator.allValid()) {
+      this.setState({ loading: true })
       this.handleSaveSubmit(e)
     } else {
       this.validator.showMessages()
       this.forceUpdate()
     }
   }
-
-  //Upload image one
-  // uploadImage_one(e) {
-  //   let imageObj = {}
-  //   let currentImageName = 'image-' + this.state.customer_id + '-' + Date.now()
-  //   let uploadImage = storage.ref(`images/${currentImageName}`).put(e)
-
-  //   uploadImage.on(
-  //     'state_changed',
-  //     snapshot => {},
-  //     error => {
-  //       alert(error)
-  //     },
-  //     () => {
-  //       storage
-  //         .ref('images')
-  //         .child(currentImageName)
-  //         .getDownloadURL()
-  //         .then(url => {
-  //           this.setState({
-  //             firebaseImage: url
-  //           })
-
-  //           // store image object in the database
-  //           imageObj = {
-  //             image_name: currentImageName,
-  //             image_data: url,
-  //             customerId: this.state.customer_id
-  //           }
-  //           axios
-  //             .modify_customer_image_one(imageObj)
-  //             .then(data => {
-  //               this.memoryDataOne(data.data._id)
-  //             })
-  //             .catch(err => {
-  //               alert('Error while uploading image using firebase storage')
-  //             })
-  //         })
-  //     }
-  //   )
-  // }
-
-  // //Upload image 2
-  // uploadImage_two(e) {
-  //   let imageObj = {}
-  //   let currentImageName = 'image-' + this.state.customer_id + '-' + Date.now()
-  //   let uploadImage = storage.ref(`images/${currentImageName}`).put(e)
-
-  //   uploadImage.on(
-  //     'state_changed',
-  //     snapshot => {},
-  //     error => {
-  //       alert(error)
-  //     },
-  //     () => {
-  //       storage
-  //         .ref('images')
-  //         .child(currentImageName)
-  //         .getDownloadURL()
-  //         .then(url => {
-  //           this.setState({
-  //             firebaseImage: url
-  //           })
-
-  //           // store image object in the database
-  //           imageObj = {
-  //             image_name: currentImageName,
-  //             image_data: url,
-  //             customerId: this.state.customer_id
-  //           }
-  //           axios
-  //             .modify_customer_image_two(imageObj)
-  //             .then(data => {
-  //               this.memoryDataTwo(data.data._id)
-  //             })
-  //             .catch(err => {
-  //               alert('Error while uploading image using firebase storage')
-  //             })
-  //         })
-  //     }
-  //   )
-  // }
 
   //RENDER PAGE
   render() {
@@ -285,7 +179,7 @@ export default class CustomerImage extends Component {
                 </button>
               </div>
               <div className="container" style={{ textAlign: 'center' }}>
-                <small>On mobile devices, please turn to LANDSCAPE mode for the photos.</small>
+                {/* <small>On mobile devices, please turn to LANDSCAPE mode for the photos.</small> */}
               </div>
               {/* Camera image */}
               <div className="container m-1" style={{ textAlign: 'center', opacity: '1' }}>
@@ -398,9 +292,17 @@ export default class CustomerImage extends Component {
                     </form>
                   </div>
                   <div className="container">
-                    <button className="btn btn-secondary" onClick={this.submitForm} type="submit">
-                      SAVE &amp; SEND
-                    </button>
+                    {this.state.loading ? (
+                      <button className="btn btn-secondary" type="button" disabled>
+                        <span className="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>{' '}
+                        UPLOADING...
+                      </button>
+                    ) : (
+                      <button className="btn btn-secondary" onClick={this.submitForm} type="submit">
+                        SAVE &amp; SEND
+                      </button>
+                    )}
+
                     <p style={{ fontFamily: 'Barlow, sans-serif' }}>
                       Powered By <img src={logo} width="80" height="80" alt="" className="d-inline-block pb-1" />
                     </p>
@@ -411,7 +313,7 @@ export default class CustomerImage extends Component {
           </MediaQuery>
           {/* View for mobile devices */}
           <MediaQuery maxDeviceWidth={1023}>
-            <div className="jumbotron" style={{ opacity: '0.9', backgroundColor: '#FFFFFF' }}>
+            <div className="jumbotron" style={{ opacity: '1', backgroundColor: '#FFFFFF' }}>
               <div className="container" style={{ textAlign: 'center' }}>
                 <h2 className="title" style={{ fontFamily: 'Permanent Marker, cursive' }}>
                   DEAR CUSTOMER
@@ -428,7 +330,7 @@ export default class CustomerImage extends Component {
                 </button>
               </div>
               <div className="container" style={{ textAlign: 'center' }}>
-                <small>On mobile devices, please turn to LANDSCAPE mode for the photos.</small>
+                {/* <small>On mobile devices, please turn to LANDSCAPE mode for the photos.</small> */}
               </div>
               {/* Camera image */}
               <div className="container m-1" style={{ textAlign: 'center', opacity: '1' }}>
@@ -531,9 +433,19 @@ export default class CustomerImage extends Component {
                     </form>
                   </div>
                   <div className="container">
-                    <button className="btn btn-secondary" onClick={this.submitForm} type="submit">
+                    {this.state.loading ? (
+                      <button className="btn btn-secondary" type="button" disabled>
+                        <span className="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>{' '}
+                        UPLOADING...
+                      </button>
+                    ) : (
+                      <button className="btn btn-secondary" onClick={this.submitForm} type="submit">
+                        SAVE &amp; SEND
+                      </button>
+                    )}
+                    {/* <button className="btn btn-secondary" onClick={this.submitForm} type="submit">
                       SAVE &amp; SEND
-                    </button>
+                    </button> */}
                     <p style={{ fontFamily: 'Barlow, sans-serif' }}>
                       Powered By <img src={logo} width="80" height="80" alt="" className="d-inline-block pb-1" />
                     </p>

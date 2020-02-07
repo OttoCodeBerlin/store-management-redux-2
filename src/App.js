@@ -30,8 +30,6 @@ if (token) {
   }
 }
 
-console.log(authenticated)
-
 class App extends Component {
   render() {
     return (
