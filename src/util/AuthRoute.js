@@ -6,7 +6,7 @@ import { Route, Redirect } from 'react-router-dom'
 // )
 
 const AuthRoute = ({ component: Component, authenticated, ...rest }) => (
-  <Route {...rest} render={props => (authenticated === true ? <Component {...props} /> : <Component {...props} />)} />
+  <Route {...rest} render={props => (authenticated === true ? <Component {...props} /> : <Redirect to="/" />)} />
 )
 
 export default AuthRoute

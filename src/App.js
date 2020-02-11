@@ -28,6 +28,8 @@ if (token) {
   } else {
     authenticated = true
   }
+} else {
+  authenticated = false
 }
 
 class App extends Component {
@@ -39,12 +41,12 @@ class App extends Component {
           <div className="container">
             <Switch>
               <Route exact path="/" component={Home} />
-              <AuthRoute exact path="/login" component={Login} authenticated={authenticated} />
-              <AuthRoute exact path="/signup" component={Signup} authenticated={authenticated} />
+              <Route exact path="/login" component={Login} />
+              <Route exact path="/signup" component={Signup} />
               <AuthRoute exact path="/profile" component={Profile} authenticated={authenticated} />
               <Route exact path="/thankyou" component={ThankYou} />
               <Route exact path="/about" component={About} />
-              <Route exact path="/confirm/:id" component={CustomerImage} />
+              <AuthRoute exact path="/confirm/:id" component={CustomerImage} authenticated={authenticated} />
             </Switch>
           </div>
         </Router>

@@ -4,6 +4,21 @@ import Navbar from '../components/Navbar'
 import Footer from '../components/Footer'
 import axios from 'axios'
 import logo_sco from '../images/sustainable_fashion_o_logo.jpg'
+import jwtDecode from 'jwt-decode'
+
+let authenticated
+const token = localStorage.FBIdToken
+if (token) {
+  const decodedToken = jwtDecode(token)
+  if (decodedToken.exp * 1000 < Date.now()) {
+    window.location.href = '/login'
+    authenticated = false
+  } else {
+    authenticated = true
+  }
+} else {
+  authenticated = false
+}
 
 export default class Profile extends Component {
   constructor(props) {
@@ -59,7 +74,6 @@ export default class Profile extends Component {
       .catch(({ response: { data } }) => {
         this.setState({ message: data.message })
       })
-    console.log(this.state)
   }
 
   //Lifecycle Method 2

@@ -1,3 +1,7 @@
+// yarn build
+// (firebase init - Hosting, do NOT overwrite index)
+// firebase deploy
+
 import React from 'react'
 import ReactDOM from 'react-dom'
 import App from './App'
