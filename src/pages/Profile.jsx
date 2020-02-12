@@ -4,34 +4,28 @@ import Navbar from '../components/Navbar'
 import Footer from '../components/Footer'
 import axios from 'axios'
 import logo_sco from '../images/sustainable_fashion_o_logo.jpg'
-import jwtDecode from 'jwt-decode'
+// import jwtDecode from 'jwt-decode'
 
-let authenticated
-const token = localStorage.FBIdToken
-if (token) {
-  const decodedToken = jwtDecode(token)
-  if (decodedToken.exp * 1000 < Date.now()) {
-    window.location.href = '/login'
-    authenticated = false
-  } else {
-    authenticated = true
-  }
-} else {
-  authenticated = false
-}
+// let authenticated
+// const token = localStorage.FBIdToken
+// if (token) {
+//   const decodedToken = jwtDecode(token)
+//   if (decodedToken.exp * 1000 < Date.now()) {
+//     window.location.href = '/login'
+//     authenticated = false
+//   } else {
+//     authenticated = true
+//   }
+// } else {
+//   authenticated = false
+// }
 
 export default class Profile extends Component {
   constructor(props) {
     super(props)
 
     this.state = {
-      user: {
-        handle: '',
-        store_location: '',
-        role: '',
-        email: '',
-        userId: ''
-      },
+      user: this.props.user,
       message: null,
       customer_email: '',
       customers: [],
@@ -49,19 +43,20 @@ export default class Profile extends Component {
 
   //Lifecycle method 1
   componentDidMount() {
-    axios
-      .get(process.env.REACT_APP_API_URL + '/user')
-      .then(res => {
-        this.setState({
-          user: res.data.credentials
-          // user.store_location: res.data.credentials.store_location,
-          // user.role: res.data.credentials.role,
-          // user.email: res.data.credentials.email,
-          // user.createdAt: res.data.credentials.createdAt,
-          // user.userId: res.data.credentials.userId,
-        })
-      })
-      .catch(err => console.log(err))
+    // axios
+    //   .get(process.env.REACT_APP_API_URL + '/user')
+    //   .then(res => {
+    // this.setState({
+    //   user: this.props.user
+    //   // user.store_location: res.data.credentials.store_location,
+    //   // user.role: res.data.credentials.role,
+    //   // user.email: res.data.credentials.email,
+    //   // user.createdAt: res.data.credentials.createdAt,
+    //   // user.userId: res.data.credentials.userId,
+    // })
+    console.log(this.props)
+    // })
+    // .catch(err => console.log(err))
 
     axios
       .get(process.env.REACT_APP_API_URL + '/customers')
