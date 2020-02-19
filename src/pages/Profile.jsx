@@ -1,24 +1,7 @@
 import React, { Component } from 'react'
 import ReactImageMagnify from 'react-image-magnify'
-import Navbar from '../components/Navbar'
-import Footer from '../components/Footer'
 import axios from 'axios'
 import logo_sco from '../images/sustainable_fashion_o_logo.jpg'
-// import jwtDecode from 'jwt-decode'
-
-// let authenticated
-// const token = localStorage.FBIdToken
-// if (token) {
-//   const decodedToken = jwtDecode(token)
-//   if (decodedToken.exp * 1000 < Date.now()) {
-//     window.location.href = '/login'
-//     authenticated = false
-//   } else {
-//     authenticated = true
-//   }
-// } else {
-//   authenticated = false
-// }
 
 export default class Profile extends Component {
   constructor(props) {
@@ -26,7 +9,7 @@ export default class Profile extends Component {
 
     this.state = {
       user: this.props.user,
-      message: null,
+      // message: null,
       customer_email: '',
       customers: [],
       filtered_customers: [],
@@ -43,32 +26,17 @@ export default class Profile extends Component {
 
   //Lifecycle method 1
   componentDidMount() {
-    // axios
-    //   .get(process.env.REACT_APP_API_URL + '/user')
-    //   .then(res => {
-    // this.setState({
-    //   user: this.props.user
-    //   // user.store_location: res.data.credentials.store_location,
-    //   // user.role: res.data.credentials.role,
-    //   // user.email: res.data.credentials.email,
-    //   // user.createdAt: res.data.credentials.createdAt,
-    //   // user.userId: res.data.credentials.userId,
+    //  axios
+    // .get(process.env.REACT_APP_API_URL + '/customers')
+    // .then(res => {
+    //   console.log(res.data)
+    //   this.setState({
+    //     customers: res.data
+    //   })
     // })
-    console.log(this.props)
+    // .catch(err => {
+    //   console.error(err)
     // })
-    // .catch(err => console.log(err))
-
-    axios
-      .get(process.env.REACT_APP_API_URL + '/customers')
-      .then(res => {
-        console.log(res.data)
-        this.setState({
-          customers: res.data
-        })
-      })
-      .catch(({ response: { data } }) => {
-        this.setState({ message: data.message })
-      })
   }
 
   //Lifecycle Method 2
@@ -82,17 +50,6 @@ export default class Profile extends Component {
     }
   }
 
-  //Get customers from database
-  // getCustomerDataFromDb = () => {
-  //   // fetch('https://europe-west1-ocb-store-management.cloudfunctions.net/api/customers')
-  //   // // fetch('http://localhost:5000/auth/customers')
-  //   // .then((data)=> data.json())
-  //   // .then((res)=> {
-  //   //   console.log(res)
-  //   //   this.setState({customers: res.allCustomers})
-  //   // })
-  // }
-
   //Delete a customer in database and update view
   deleteCustomer = (id, e) => {
     e.preventDefault()
@@ -104,8 +61,8 @@ export default class Profile extends Component {
             customers: res.data
           })
         })
-        .catch(({ response: { data } }) => {
-          this.setState({ message: data.message })
+        .catch(err => {
+          console.error(err)
         })
       //   fetch(process.env.REACT_APP_API_URL + '/auth/customers')
       //   .then((data)=> data.json())
@@ -155,18 +112,9 @@ export default class Profile extends Component {
         // axios.defaults.headers.common['Authorization']= `Bearer ${res.data.token}`
         // this.props.history.push('/profile')
       })
-      .catch(({ response: { data } }) => {
-        this.setState({ message: data.message })
+      .catch(err => {
+        console.error(err)
       })
-    // AuthService.add_customer(this.state)
-    //   .then(({user, customer_email}) => {
-    //     alert('Added')
-    //     this.resetForm()
-    //     this.props.history.push('/profile')
-    //   })
-    //   .catch(({ response: { data } }) => {
-    //     this.setState({ message: data.message })
-    //   })
   }
 
   //Form Submit handler for customer email
@@ -181,7 +129,6 @@ export default class Profile extends Component {
 
   //Auth logout method
   handleLogout = () => {
-    // AuthService.logout()
     localStorage.removeItem('FBIdToken')
     delete axios.defaults.headers.common['Authorization']
     this.props.history.push('/')
@@ -231,10 +178,12 @@ export default class Profile extends Component {
     })
     this.setState({ filtered_customers })
   }
+
   //RENDER VIEW
   render() {
     let customer_group
-    const { user, message, customer_email } = this.state
+    const { user, customer_email } = this.state
+    console.log(user)
     //Show original customer list if search field is empty, and filtered list if search is in place
     this.state.filtered_customers.length === 0 && !this.state.no_search_value
       ? (customer_group = this.state.customers)
@@ -350,12 +299,12 @@ export default class Profile extends Component {
     }
 
     //Message if login is not valid
-    if (!user) return <p>{message}</p>
+    // if (!user) return <p>{message}</p>
 
     return (
       //NAVBAR
       <div>
-        <Navbar />
+        {/* <Navbar /> */}
         <div className="container mt-5 pt-3">
           {/* CARD HEADER LAYOUT */}
           <div className="card text-center mt-5 mb-5">
@@ -497,9 +446,9 @@ export default class Profile extends Component {
               </button>
             </div>
           </div>
-          {message && <p>{message}</p>}
+          {/* {message && <p>{message}</p>} */}
         </div>
-        <Footer />
+        {/* <Footer /> */}
       </div>
     )
   }

@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import SimpleReactValidator from 'simple-react-validator'
-import Navbar from '../components/Navbar'
-import Footer from '../components/Footer'
+// import Navbar from '../components/Navbar'
+// import Footer from '../components/Footer'
 import axios from 'axios'
 
 export default class Signup extends Component {
@@ -70,7 +70,7 @@ export default class Signup extends Component {
     const { password, confirmPassword, handle, email, store_location, role, message } = this.state
     return (
       <div>
-        <Navbar />
+        {/* <Navbar /> */}
         <div className="container " style={{ position: 'relative' }}>
           <div className="container" style={{ marginTop: '90px', position: 'absolute' }}>
             <form className="vertical-center" onSubmit={this.handleSubmit}>
@@ -169,7 +169,7 @@ export default class Signup extends Component {
           {/* Customer error message, if applicable */}
           {message && <p>{message}</p>}
         </div>
-        <Footer />
+        {/* <Footer /> */}
       </div>
     )
   }
