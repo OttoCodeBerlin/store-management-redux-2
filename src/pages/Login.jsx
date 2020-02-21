@@ -3,7 +3,6 @@ import { Link } from 'react-router-dom'
 
 export default class Login extends Component {
   submitForm = () => {
-    console.log('Form Called')
     this.props.submitHandler()
   }
 

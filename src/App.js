@@ -30,6 +30,7 @@ if (token) {
 } else {
   authenticated = false
 }
+console.log(authenticated)
 
 // if (authenticated) {
 //   axios
@@ -47,44 +48,43 @@ export default class App extends Component {
   constructor(props) {
     super(props)
     this.state = {
-      user: { email: '', password: '' }
+      email: '',
+      password: ''
     }
     this.handleInput = this.handleInput.bind(this)
     this.handleSubmit = this.handleSubmit.bind(this)
   }
 
   //Input handler
-  // handleInput = ({ target: input }) => {
-  //   const { name, value } = input
-  //   this.setState({
-  //     [name]: value
-  //   })
-  // }
-
   handleInput = ({ target: input }) => {
-    console.log('Input Called')
     const { name, value } = input
     this.setState({
-      user: { [name]: value }
+      [name]: value
     })
   }
 
+  // handleInput = (name, value) => {
+  //   console.log(name)
+  //   console.log(value)
+  //   this.setState({
+  //     [name]: value
+  //   })
+  //   console.log(this.state)
+  // }
+
   //Submit data handler calling Auth Service
   handleSubmit = e => {
-    console.log('Submit Called')
     if (e) e.preventDefault()
-
     const userData = {
-      email: this.state.user.email,
-      password: this.state.user.password
+      email: this.state.email,
+      password: this.state.password
     }
-
     axios
       .post(process.env.REACT_APP_API_URL + '/login', userData)
       .then(res => {
         localStorage.setItem('FBIdToken', `Bearer ${res.data.token}`)
         axios.defaults.headers.common['Authorization'] = `Bearer ${res.data.token}`
-        this.props.history.push('/profile')
+        // this.props.history.push('/profile')
       })
       .catch(err => {
         console.error(err)
@@ -92,31 +92,35 @@ export default class App extends Component {
   }
 
   render() {
-    const { user } = this.state
-    console.log(user)
-    console.log(authenticated)
     return (
       <div className="App">
         <Router>
-          {/* <Navbar user={user} authenticated={authenticated} /> */}
-          {/* <div className="container"> */}
           <Switch>
             <Route exact path="/" component={Home} />
             <Route
               path="/login"
-              component={Login}
-              email={this.state.user.email}
-              password={this.state.user.password}
-              submitHandler={this.handleSubmit}
-              inputHandler={this.handleInput}
+              render={props => (
+                <Login
+                  {...props}
+                  email={this.state.email}
+                  password={this.state.password}
+                  submitHandler={this.handleSubmit}
+                  inputHandler={this.handleInput}
+                />
+              )}
             />
             <Route path="/signup" component={Signup} />
-            <AuthRoute path="/profile" component={Profile} authenticated={authenticated} user={user} />
+            <AuthRoute
+              path="/profile"
+              component={Profile}
+              authenticated={authenticated}
+              email={this.state.email}
+              password={this.state.password}
+            />
             <Route path="/thankyou" component={ThankYou} />
             <Route path="/about" component={About} />
             <AuthRoute path="/confirm/:id" component={CustomerImage} authenticated={authenticated} />
           </Switch>
-          {/* </div> */}
         </Router>
       </div>
     )
