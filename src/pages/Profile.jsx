@@ -6,9 +6,9 @@ import logo_sco from '../images/sustainable_fashion_o_logo.jpg'
 export default class Profile extends Component {
   constructor(props) {
     super(props)
-
+console.log(props)
     this.state = {
-      user: this.props.user,
+      user_email: this.props.email,
       // message: null,
       customer_email: '',
       customers: [],
@@ -182,8 +182,7 @@ export default class Profile extends Component {
   //RENDER VIEW
   render() {
     let customer_group
-    const { user, customer_email } = this.state
-    console.log(user)
+    const { user_email, customer_email } = this.state
     //Show original customer list if search field is empty, and filtered list if search is in place
     this.state.filtered_customers.length === 0 && !this.state.no_search_value
       ? (customer_group = this.state.customers)
@@ -431,14 +430,14 @@ export default class Profile extends Component {
                     </li>
                   </div>
                   <li className="list-group-item text-center">
-                    Username: <b>{user.handle}</b>
+                    User Email: <b>{user_email}</b>
                   </li>
-                  <li className="list-group-item text-center">
+                  {/* <li className="list-group-item text-center">
                     Store Location: <b>{user.store_location}</b>
                   </li>
                   <li className="list-group-item text-center">
                     Role: <b>{user.role}</b>
-                  </li>
+                  </li> */}
                 </ul>
               </div>
               <button className="btn btn-secondary mt-3" onClick={this.handleLogout}>

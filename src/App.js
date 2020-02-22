@@ -82,6 +82,7 @@ export default class App extends Component {
     axios
       .post(process.env.REACT_APP_API_URL + '/login', userData)
       .then(res => {
+        console.log(res)
         localStorage.setItem('FBIdToken', `Bearer ${res.data.token}`)
         axios.defaults.headers.common['Authorization'] = `Bearer ${res.data.token}`
         // this.props.history.push('/profile')
@@ -110,12 +111,9 @@ export default class App extends Component {
               )}
             />
             <Route path="/signup" component={Signup} />
-            <AuthRoute
+            <Route
               path="/profile"
-              component={Profile}
-              authenticated={authenticated}
-              email={this.state.email}
-              password={this.state.password}
+              render={props => <Profile {...props} user_email={this.state.email} authenticated={authenticated} />}
             />
             <Route path="/thankyou" component={ThankYou} />
             <Route path="/about" component={About} />
