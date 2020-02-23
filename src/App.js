@@ -30,26 +30,21 @@ if (token) {
 } else {
   authenticated = false
 }
-console.log(authenticated)
-
-// if (authenticated) {
-//   axios
-//     .get(process.env.REACT_APP_API_URL + '/user')
-//     .then(res => {
-//       this.setState({
-//         user: res.data.credentials
-//       })
-//     })
-//     .catch(err => console.log(err))
-// } else {
-// }
 
 export default class App extends Component {
   constructor(props) {
     super(props)
     this.state = {
       email: '',
-      password: ''
+      password: '',
+      user: {
+        handle: '',
+        userId: '',
+        email: '',
+        createdAt: '',
+        role: '',
+        store_location: ''
+      }
     }
     this.handleInput = this.handleInput.bind(this)
     this.handleSubmit = this.handleSubmit.bind(this)
@@ -82,10 +77,9 @@ export default class App extends Component {
     axios
       .post(process.env.REACT_APP_API_URL + '/login', userData)
       .then(res => {
-        console.log(res)
         localStorage.setItem('FBIdToken', `Bearer ${res.data.token}`)
-        axios.defaults.headers.common['Authorization'] = `Bearer ${res.data.token}`
-        // this.props.history.push('/profile')
+        // axios.defaults.headers.common['Authorization'] = `Bearer ${res.data.token}`
+        window.location.href = '/profile'
       })
       .catch(err => {
         console.error(err)
@@ -93,6 +87,7 @@ export default class App extends Component {
   }
 
   render() {
+    console.log(this.state.user)
     return (
       <div className="App">
         <Router>

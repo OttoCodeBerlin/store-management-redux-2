@@ -6,9 +6,15 @@ import logo_sco from '../images/sustainable_fashion_o_logo.jpg'
 export default class Profile extends Component {
   constructor(props) {
     super(props)
-console.log(props)
     this.state = {
-      user_email: this.props.email,
+      user: {
+        handle: '',
+        userId: '',
+        email: '',
+        createdAt: '',
+        role: '',
+        store_location: ''
+      },
       // message: null,
       customer_email: '',
       customers: [],
@@ -26,17 +32,30 @@ console.log(props)
 
   //Lifecycle method 1
   componentDidMount() {
-    //  axios
-    // .get(process.env.REACT_APP_API_URL + '/customers')
-    // .then(res => {
-    //   console.log(res.data)
-    //   this.setState({
-    //     customers: res.data
-    //   })
-    // })
-    // .catch(err => {
-    //   console.error(err)
-    // })
+    axios
+      .get(process.env.REACT_APP_API_URL + '/user', {
+        headers: {
+          Authorization: localStorage.FBIdToken
+        }
+      })
+      .then(res => {
+        this.setState({
+          user: res.data.credentials
+        })
+      })
+      .catch(err => console.log(err))
+
+    axios
+      .get(process.env.REACT_APP_API_URL + '/customers')
+      .then(res => {
+        console.log(res.data)
+        this.setState({
+          customers: res.data
+        })
+      })
+      .catch(err => {
+        console.error(err)
+      })
   }
 
   //Lifecycle Method 2
@@ -53,26 +72,33 @@ console.log(props)
   //Delete a customer in database and update view
   deleteCustomer = (id, e) => {
     e.preventDefault()
-    axios.delete(process.env.REACT_APP_API_URL + '/customer/' + id).then(response => {
-      axios
-        .get(process.env.REACT_APP_API_URL + '/customers')
-        .then(res => {
-          this.setState({
-            customers: res.data
+
+    axios
+      .delete(process.env.REACT_APP_API_URL + '/customer/' + id, {
+        headers: {
+          Authorization: localStorage.FBIdToken
+        }
+      })
+      .then(response => {
+        axios
+          .get(process.env.REACT_APP_API_URL + '/customers')
+          .then(res => {
+            this.setState({
+              customers: res.data
+            })
           })
-        })
-        .catch(err => {
-          console.error(err)
-        })
-      //   fetch(process.env.REACT_APP_API_URL + '/auth/customers')
-      //   .then((data)=> data.json())
-      //   .then((res)=> this.setState({customers: res.allCustomers}))
-      //   this.props.history.push('/profile')
-      // })
-      // .catch(({ response: { data } }) => {
-      //   this.setState({ message: data.message })
-      // })
-    })
+          .catch(err => {
+            console.error(err)
+          })
+        //   fetch(process.env.REACT_APP_API_URL + '/auth/customers')
+        //   .then((data)=> data.json())
+        //   .then((res)=> this.setState({customers: res.allCustomers}))
+        //   this.props.history.push('/profile')
+        // })
+        // .catch(({ response: { data } }) => {
+        //   this.setState({ message: data.message })
+        // })
+      })
   }
 
   //Send reminder email to customer
@@ -182,7 +208,7 @@ console.log(props)
   //RENDER VIEW
   render() {
     let customer_group
-    const { user_email, customer_email } = this.state
+    const { customer_email, user } = this.state
     //Show original customer list if search field is empty, and filtered list if search is in place
     this.state.filtered_customers.length === 0 && !this.state.no_search_value
       ? (customer_group = this.state.customers)
@@ -430,14 +456,17 @@ console.log(props)
                     </li>
                   </div>
                   <li className="list-group-item text-center">
-                    User Email: <b>{user_email}</b>
+                    User: <b>{user.handle}</b>
                   </li>
-                  {/* <li className="list-group-item text-center">
+                  <li className="list-group-item text-center">
+                    Email: <b>{user.email}</b>
+                  </li>
+                  <li className="list-group-item text-center">
                     Store Location: <b>{user.store_location}</b>
                   </li>
                   <li className="list-group-item text-center">
                     Role: <b>{user.role}</b>
-                  </li> */}
+                  </li>
                 </ul>
               </div>
               <button className="btn btn-secondary mt-3" onClick={this.handleLogout}>
