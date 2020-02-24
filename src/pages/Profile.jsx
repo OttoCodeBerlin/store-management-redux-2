@@ -42,20 +42,14 @@ export default class Profile extends Component {
         this.setState({
           user: res.data.credentials
         })
-      })
-      .catch(err => console.log(err))
-
-    axios
-      .get(process.env.REACT_APP_API_URL + '/customers')
-      .then(res => {
-        console.log(res.data)
-        this.setState({
-          customers: res.data
-        })
+        return
       })
       .catch(err => {
-        console.error(err)
+        console.log(err)
+        return
       })
+
+    this.updateCustomerList()
   }
 
   //Lifecycle Method 2
@@ -69,6 +63,21 @@ export default class Profile extends Component {
     }
   }
 
+  updateCustomerList = () => {
+    axios
+      .get(process.env.REACT_APP_API_URL + '/customers')
+      .then(res => {
+        this.setState({
+          customers: res.data
+        })
+        return
+      })
+      .catch(err => {
+        console.error(err)
+        return
+      })
+  }
+
   //Delete a customer in database and update view
   deleteCustomer = (id, e) => {
     e.preventDefault()
@@ -79,26 +88,21 @@ export default class Profile extends Component {
           Authorization: localStorage.FBIdToken
         }
       })
-      .then(response => {
-        axios
-          .get(process.env.REACT_APP_API_URL + '/customers')
-          .then(res => {
-            this.setState({
-              customers: res.data
-            })
-          })
-          .catch(err => {
-            console.error(err)
-          })
-        //   fetch(process.env.REACT_APP_API_URL + '/auth/customers')
-        //   .then((data)=> data.json())
-        //   .then((res)=> this.setState({customers: res.allCustomers}))
-        //   this.props.history.push('/profile')
-        // })
-        // .catch(({ response: { data } }) => {
-        //   this.setState({ message: data.message })
-        // })
+      .then(res => {
+        return this.updateCustomerList()
       })
+      .catch(err => {
+        return console.error(err)
+      })
+
+    //   fetch(process.env.REACT_APP_API_URL + '/auth/customers')
+    //   .then((data)=> data.json())
+    //   .then((res)=> this.setState({customers: res.allCustomers}))
+    //   this.props.history.push('/profile')
+    // })
+    // .catch(({ response: { data } }) => {
+    //   this.setState({ message: data.message })
+    // })
   }
 
   //Send reminder email to customer
@@ -127,7 +131,6 @@ export default class Profile extends Component {
   //Submit handler for customer email input
   handleSubmit = e => {
     if (e) e.preventDefault()
-    console.log(this.state.customer_email)
     axios
       .post(process.env.REACT_APP_API_URL + '/customer', { email: this.state.customer_email })
       .then(res => {
@@ -231,14 +234,18 @@ export default class Profile extends Component {
       customers = customer_group.map((
         customer //if search has results, show them in a list
       ) => (
+        
         <tr key={customer._id}>
           <td className="align-middle p-0">{customer.first_name}</td>
           <td className="align-middle p-0">{customer.last_name}</td>
           <td className="align-middle p-0">
             <small>{customer.email}</small>
           </td>
+          <td className="align-middle p-0">
+            <small>{customer.userHandle}</small>
+          </td>
 
-          {customer.customerImage_1 !== 'tbd' ? ( //If customer pictures exist, show them with links to large view
+          {customer.customerImage_1 !== '' ? ( //If customer pictures exist, show them with links to large view
             <td className="align-middle p-0">
               <span>
                 <ReactImageMagnify
@@ -426,6 +433,7 @@ export default class Profile extends Component {
                     <th scope="col">First Name</th>
                     <th scope="col">Last Name</th>
                     <th scope="col">Email</th>
+                    <th scope="col">Created By</th>
                     <th scope="col">Pictures</th>
                     <th scope="col">Last Updated</th>
                     <th scope="col">Actions</th>

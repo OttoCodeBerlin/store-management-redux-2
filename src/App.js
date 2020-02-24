@@ -6,7 +6,8 @@ import axios from 'axios'
 
 //Components
 import AuthRoute from './util/AuthRoute'
-// import Navbar from './components/Navbar'
+import Navbar from './components/Navbar'
+import Footer from './components/Footer'
 
 //Pages
 import Home from '../src/pages/Home'
@@ -58,15 +59,6 @@ export default class App extends Component {
     })
   }
 
-  // handleInput = (name, value) => {
-  //   console.log(name)
-  //   console.log(value)
-  //   this.setState({
-  //     [name]: value
-  //   })
-  //   console.log(this.state)
-  // }
-
   //Submit data handler calling Auth Service
   handleSubmit = e => {
     if (e) e.preventDefault()
@@ -78,18 +70,18 @@ export default class App extends Component {
       .post(process.env.REACT_APP_API_URL + '/login', userData)
       .then(res => {
         localStorage.setItem('FBIdToken', `Bearer ${res.data.token}`)
-        // axios.defaults.headers.common['Authorization'] = `Bearer ${res.data.token}`
         window.location.href = '/profile'
+        return
       })
       .catch(err => {
-        console.error(err)
+        return console.error(err)
       })
   }
 
   render() {
-    console.log(this.state.user)
     return (
       <div className="App">
+        <Navbar authenthicated={authenticated} user={this.state.user} />
         <Router>
           <Switch>
             <Route exact path="/" component={Home} />
@@ -115,6 +107,7 @@ export default class App extends Component {
             <AuthRoute path="/confirm/:id" component={CustomerImage} authenticated={authenticated} />
           </Switch>
         </Router>
+        <Footer />
       </div>
     )
   }
