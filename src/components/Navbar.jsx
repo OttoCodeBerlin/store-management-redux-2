@@ -3,11 +3,10 @@ import logo from '../images/ocb_logo_200x200.png'
 
 export default class Navbar extends Component {
   render() {
-    console.log(this.props)
     const { authenticated } = this.props
+    // console.log(localStorage.FBIdToken) 
     let hyperlinkString
     authenticated  ? hyperlinkString="/profile" : hyperlinkString="/"
-    console.log(hyperlinkString)
     return (
       <div>
         <nav className="navbar fixed-top navbar-light pt-1 pb-0" style={{ backgroundColor: '#D2D3D6' }}>

@@ -2,7 +2,19 @@ import React, { Component } from 'react'
 import { Link } from 'react-router-dom'
 
 export default class Login extends Component {
+  constructor(props) {
+    super(props)
+    this.state = {
+      loading: false
+    }
+
+    // this.deleteCustomer = this.deleteCustomer.bind(this)
+  }
+
   submitForm = () => {
+    this.setState({
+      loading: true
+    })
     this.props.submitHandler()
   }
 
@@ -35,9 +47,17 @@ export default class Login extends Component {
                   onChange={this.props.inputHandler}
                 />
               </div>
-              <button type="submit" className="btn btn-secondary" onClick={this.submitForm}>
-                Log In
-              </button>
+
+              {this.state.loading ? (
+                <button className="btn btn-secondary" type="submit" disabled>
+                  <span className="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                </button>
+              ) : (
+                <button type="submit" className="btn btn-secondary" onClick={this.submitForm}>
+                  Log In
+                </button>
+              )}
+
               <p className="mt-5">
                 If you don't have an account, please sign up <Link to="/signup">here</Link>.
               </p>

@@ -302,7 +302,6 @@ export default class CustomerImage extends Component {
                         SAVE &amp; SEND
                       </button>
                     )}
-
                     <p style={{ fontFamily: 'Barlow, sans-serif' }}>
                       Powered By <img src={logo} width="80" height="80" alt="" className="d-inline-block pb-1" />
                     </p>

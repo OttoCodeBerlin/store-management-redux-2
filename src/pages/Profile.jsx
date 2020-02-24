@@ -24,7 +24,9 @@ export default class Profile extends Component {
       is_customerlist_visible: false,
       is_useraccount_visible: false,
       is_search_unsuccessful: false,
-      no_search_value: false
+      no_search_value: false,
+      addcustomer_loading: false,
+      customerlist_loading: false
     }
 
     this.deleteCustomer = this.deleteCustomer.bind(this)
@@ -64,15 +66,22 @@ export default class Profile extends Component {
   }
 
   updateCustomerList = () => {
+    this.setState({
+      customerlist_loading: true
+    })
     axios
       .get(process.env.REACT_APP_API_URL + '/customers')
       .then(res => {
         this.setState({
-          customers: res.data
+          customers: res.data,
+          customerlist_loading: false
         })
         return
       })
       .catch(err => {
+        this.setState({
+          customerlist_loading: false
+        })
         console.error(err)
         return
       })
@@ -131,17 +140,35 @@ export default class Profile extends Component {
   //Submit handler for customer email input
   handleSubmit = e => {
     if (e) e.preventDefault()
+    this.setState({
+      addcustomer_loading: true
+    })
     axios
-      .post(process.env.REACT_APP_API_URL + '/customer', { email: this.state.customer_email })
+      .post(
+        process.env.REACT_APP_API_URL + '/customer',
+        { email: this.state.customer_email },
+        {
+          headers: {
+            Authorization: localStorage.FBIdToken
+          }
+        }
+      )
       .then(res => {
         alert('Added')
         this.resetForm()
+        this.setState({
+          addcustomer_loading: false
+        })
+        this.updateCustomerList()
         // this.props.history.push('/profile')
         // localStorage.setItem('FBIdToken', `Bearer ${res.data.token}`)
         // axios.defaults.headers.common['Authorization']= `Bearer ${res.data.token}`
         // this.props.history.push('/profile')
       })
       .catch(err => {
+        this.setState({
+          addcustomer_loading: false
+        })
         console.error(err)
       })
   }
@@ -219,31 +246,40 @@ export default class Profile extends Component {
 
     //FILTERED CUSTOMERS MAPPING LIST
     let customers
-    if (customer_group.length === 0) {
+    if (this.state.customerlist_loading === true) {
       //If search has no results show warning
       customers = (
-        // <div className="container mt-5 ml-5">
-        //   <div className="alert alert-danger" role="alert" >
+        <tr>
+          <th>Loading...</th>
+        </tr>
+      )
+    } else if (customer_group.length === 0) {
+      //If search has no results show warning
+      customers = (
         <tr>
           <th>Sorry, no entries found matching your criteria.</th>
         </tr>
-        // </div>
-        //</div>
       )
     } else {
       customers = customer_group.map((
         customer //if search has results, show them in a list
       ) => (
-        
         <tr key={customer._id}>
           <td className="align-middle p-0">{customer.first_name}</td>
           <td className="align-middle p-0">{customer.last_name}</td>
           <td className="align-middle p-0">
             <small>{customer.email}</small>
           </td>
-          <td className="align-middle p-0">
-            <small>{customer.userHandle}</small>
-          </td>
+
+          {customer.userHandle === this.state.user.handle ? (
+            <td className="align-middle p-0" style={{backgroundColor: 'lightgrey'}}>
+              <small>{customer.userHandle} <br/> <strong>(current)</strong></small>
+            </td>
+          ) : (
+            <td className="align-middle p-0">
+              <small>{customer.userHandle}</small>
+            </td>
+          )}
 
           {customer.customerImage_1 !== '' ? ( //If customer pictures exist, show them with links to large view
             <td className="align-middle p-0">
@@ -405,9 +441,18 @@ export default class Profile extends Component {
                       onChange={this.handleInput}
                     />
                   </div>
-                  <button type="submit" className="btn btn-secondary btn-lg mt-3">
-                    ADD CUSTOMER
-                  </button>
+                  {this.state.addcustomer_loading ? (
+                    <button className="btn btn-secondary mt-3" type="submit" disabled>
+                      <span className="spinner-border spinner-border-sm" role="status" aria-hidden="true">
+                        {' '}
+                        Please wait...
+                      </span>
+                    </button>
+                  ) : (
+                    <button type="submit" className="btn btn-secondary btn-lg mt-3">
+                      Add Customer
+                    </button>
+                  )}
                 </form>
               </div>
             </div>
