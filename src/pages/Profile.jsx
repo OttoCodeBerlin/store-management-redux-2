@@ -1,6 +1,7 @@
 import React, { Component } from 'react'
 import ReactImageMagnify from 'react-image-magnify'
 import axios from 'axios'
+import moment from 'moment'
 import logo_sco from '../images/sustainable_fashion_o_logo.jpg'
 
 export default class Profile extends Component {
@@ -272,8 +273,10 @@ export default class Profile extends Component {
           </td>
 
           {customer.userHandle === this.state.user.handle ? (
-            <td className="align-middle p-0" style={{backgroundColor: 'lightgrey'}}>
-              <small>{customer.userHandle} <br/> <strong>(current)</strong></small>
+            <td className="align-middle p-0" style={{ backgroundColor: 'lightgrey' }}>
+              <small>
+                {customer.userHandle} <br /> <strong>(current)</strong>
+              </small>
             </td>
           ) : (
             <td className="align-middle p-0">
@@ -334,7 +337,9 @@ export default class Profile extends Component {
           )}
           <td className="align-middle p-0">
             {/* <small>{customer.updatedAt.substring(0, 10)}</small> */}
-            <small>{customer.updatedAt}</small>
+            <small>{customer.updatedAt.slice(0, 10)}</small>
+            <br/>
+             {(customer.updatedAt.length>0) ? (<small>{ '(' + moment(customer.updatedAt.slice(0, 10), 'YYYY-MM-DD').fromNow() + ')'} </small>) : ('') } 
           </td>
           <td className="align-middle p-0">
             <button

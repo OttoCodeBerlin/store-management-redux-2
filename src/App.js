@@ -81,7 +81,7 @@ export default class App extends Component {
   render() {
     return (
       <div className="App">
-        <Navbar authenticated={authenticated}/>
+        <Navbar authenticated={authenticated} />
         <Router>
           <Switch>
             <Route exact path="/" component={Home} />
@@ -104,7 +104,7 @@ export default class App extends Component {
             />
             <Route path="/thankyou" component={ThankYou} />
             <Route path="/about" component={About} />
-            <AuthRoute path="/confirm/:id" component={CustomerImage} authenticated={authenticated} />
+            <Route path="/confirm/:id" component={CustomerImage} authenticated={authenticated} />
           </Switch>
         </Router>
         <Footer />
