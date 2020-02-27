@@ -7,8 +7,6 @@ export default class Login extends Component {
     this.state = {
       loading: false
     }
-
-    // this.deleteCustomer = this.deleteCustomer.bind(this)
   }
 
   submitForm = () => {
@@ -19,7 +17,6 @@ export default class Login extends Component {
   }
 
   render() {
-    // const { email, password } = this.state
     return (
       <div>
         <div className="container " style={{ position: 'relative' }}>

@@ -35,6 +35,9 @@ export default class Profile extends Component {
 
   //Lifecycle method 1
   componentDidMount() {
+    if (!this.props.authenticated ) {
+      this.props.history.push('/')
+    } else {
     axios
       .get(process.env.REACT_APP_API_URL + '/user', {
         headers: {
@@ -53,6 +56,7 @@ export default class Profile extends Component {
       })
 
     this.updateCustomerList()
+  }
   }
 
   //Lifecycle Method 2
@@ -91,7 +95,6 @@ export default class Profile extends Component {
   //Delete a customer in database and update view
   deleteCustomer = (id, e) => {
     e.preventDefault()
-
     axios
       .delete(process.env.REACT_APP_API_URL + '/customer/' + id, {
         headers: {
@@ -104,30 +107,28 @@ export default class Profile extends Component {
       .catch(err => {
         return console.error(err)
       })
-
-    //   fetch(process.env.REACT_APP_API_URL + '/auth/customers')
-    //   .then((data)=> data.json())
-    //   .then((res)=> this.setState({customers: res.allCustomers}))
-    //   this.props.history.push('/profile')
-    // })
-    // .catch(({ response: { data } }) => {
-    //   this.setState({ message: data.message })
-    // })
   }
 
   //Send reminder email to customer
   resendCustomer = (id, e) => {
     e.preventDefault()
-    // AuthService.resend_customer(this.state, id)
-    //   .then(response => {
-    //     fetch(process.env.REACT_APP_API_URL + '/auth/customers')
-    //     .then((data)=> data.json())
-    //     .then((res)=> this.setState({customers: res.allCustomers}))
-    //     this.props.history.push('/profile')
-    //   })
-    //   .catch(({ response: { data } }) => {
-    //     this.setState({ message: data.message })
-    //   })
+    axios
+      .post(
+        process.env.REACT_APP_API_URL + '/customer/' + id + '/confirm',
+        { data: '' },
+        {
+          headers: {
+            Authorization: localStorage.FBIdToken
+          }
+        }
+      )
+      .then(res => {
+        alert('Confirmation email sent to customer.')
+        this.updateCustomerList()
+      })
+      .catch(err => {
+        return console.error(err)
+      })
   }
 
   //Input change handler for customer email input
@@ -330,6 +331,10 @@ export default class Profile extends Component {
               {/* <a href={customer.picture_two.image_data} target="_blank" style={{cursor: 'pointer'}}  onClick={()=>{ window.open(customer.picture_two.image_data, "Popup","toolbar=no, location=no, statusbar=no, menubar=no, scrollbars=1, resizable=0, width=700, height=500, top=30") }}> */}
               {/* <img src={customer.picture_two.image_data} style={{ height: 'auto', width: '30%' , margin: '5px'  }} alt="" className="thumbnail"/> */}
             </td>
+          ) : customer.updatedAt.length > 0 ? (
+            <td className="align-middle p-0">
+              <small style={{ color: 'orange' }}>Data Confirmation Requested</small>
+            </td>
           ) : (
             <td className="align-middle p-0">
               <small style={{ color: 'red' }}>Customer Confirmation Pending</small>
@@ -338,8 +343,12 @@ export default class Profile extends Component {
           <td className="align-middle p-0">
             {/* <small>{customer.updatedAt.substring(0, 10)}</small> */}
             <small>{customer.updatedAt.slice(0, 10)}</small>
-            <br/>
-             {(customer.updatedAt.length>0) ? (<small>{ '(' + moment(customer.updatedAt.slice(0, 10), 'YYYY-MM-DD').fromNow() + ')'} </small>) : ('') } 
+            <br />
+            {customer.updatedAt.length > 0 ? (
+              <small>{'(' + moment(customer.updatedAt.slice(0, 10), 'YYYY-MM-DD').fromNow() + ')'} </small>
+            ) : (
+              ''
+            )}
           </td>
           <td className="align-middle p-0">
             <button
@@ -360,7 +369,7 @@ export default class Profile extends Component {
                 if (
                   window.confirm('You are going to send an email to the customer to request new data. Are you sure?')
                 ) {
-                  this.resendCustomer(customer._id, e)
+                  this.resendCustomer(customer.customerId, e)
                 }
               }}
             >

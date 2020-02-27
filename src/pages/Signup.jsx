@@ -1,65 +1,23 @@
 import React, { Component } from 'react'
 import SimpleReactValidator from 'simple-react-validator'
-// import Navbar from '../components/Navbar'
-// import Footer from '../components/Footer'
-import axios from 'axios'
 
 export default class Signup extends Component {
   constructor(props) {
     super(props)
 
     this.state = {
-      handle: '',
-      email: '',
-      password: '',
-      confirmPassword: '',
-      store_location: '',
-      role: '',
-      message: null
+      loading: false
     }
-
     this.validator = new SimpleReactValidator()
-  }
-
-  //Input handler
-  handleInput = ({ target: input }) => {
-    const { name, value } = input
-    this.setState({
-      [name]: value
-    })
-  }
-
-  //Submit handler with AuthService
-  handleSubmit = e => {
-    if (e) e.preventDefault()
-
-    const newUserData = {
-      handle: this.state.handle,
-      email: this.state.email,
-      password: this.state.password,
-      confirmPassword: this.state.confirmPassword,
-      store_location: this.state.store_location,
-      role: this.state.role
-    }
-
-    axios
-      .post('/signup', newUserData)
-      .then(res => {
-        console.log(res.data)
-        localStorage.setItem('FBIdToken', `Bearer ${res.data.token}`)
-        axios.defaults.headers.common['Authorization'] = `Bearer ${res.data.token}`
-        this.props.history.push('/profile')
-      })
-      .catch(({ response: { data } }) => {
-        this.setState({ message: data.message })
-      })
   }
 
   //Call final submit
   submitForm = () => {
     if (this.validator.allValid()) {
-      alert('Thank you!')
-      this.handleSubmit()
+      this.setState({
+        loading: true
+      })
+      this.props.submitHandler()
     } else {
       this.validator.showMessages()
       this.forceUpdate()
@@ -67,13 +25,13 @@ export default class Signup extends Component {
   }
 
   render() {
-    const { password, confirmPassword, handle, email, store_location, role, message } = this.state
+    const { password, confirmPassword, handle, email, store_location, role, inputHandler, submitHandler } = this.props
     return (
       <div>
         {/* <Navbar /> */}
         <div className="container " style={{ position: 'relative' }}>
           <div className="container" style={{ marginTop: '90px', position: 'absolute' }}>
-            <form className="vertical-center" onSubmit={this.handleSubmit}>
+            <form className="vertical-center" onSubmit={submitHandler}>
               <h5 className="title">Sign up</h5>
               <div className="form-group vertical-center">
                 <label htmlFor="handle">Username</label>
@@ -82,7 +40,7 @@ export default class Signup extends Component {
                   name="handle"
                   value={handle}
                   placeholder="Select Username..."
-                  onChange={this.handleInput}
+                  onChange={inputHandler}
                   className="form-control"
                   id="handle"
                 />
@@ -95,7 +53,7 @@ export default class Signup extends Component {
                   name="email"
                   value={email}
                   placeholder="Email"
-                  onChange={this.handleInput}
+                  onChange={inputHandler}
                   className="form-control"
                   id="email"
                 />
@@ -108,7 +66,7 @@ export default class Signup extends Component {
                   name="password"
                   placeholder="Password..."
                   value={password}
-                  onChange={this.handleInput}
+                  onChange={inputHandler}
                   className="form-control"
                   id="password"
                 />
@@ -121,7 +79,7 @@ export default class Signup extends Component {
                   name="confirmPassword"
                   placeholder="Confirm Password..."
                   value={confirmPassword}
-                  onChange={this.handleInput}
+                  onChange={inputHandler}
                   className="form-control"
                   id="confirmPassword"
                 />
@@ -134,7 +92,7 @@ export default class Signup extends Component {
                   id="store_location"
                   name="store_location"
                   value={store_location}
-                  onChange={this.handleInput}
+                  onChange={inputHandler}
                 >
                   <option value="" disabled>
                     Select...
@@ -151,7 +109,7 @@ export default class Signup extends Component {
               </div>
               <div className="form-group vertical-center">
                 <label htmlFor="role">Role</label>
-                <select className="custom-select mb-3" id="role" name="role" value={role} onChange={this.handleInput}>
+                <select className="custom-select mb-3" id="role" name="role" value={role} onChange={inputHandler}>
                   <option value="" disabled>
                     Select...
                   </option>
@@ -161,13 +119,20 @@ export default class Signup extends Component {
                 </select>
                 {this.validator.message('role', role, 'required|string')}
               </div>
-              <button className="btn btn-secondary" onClick={this.submitForm}>
-                Create Account
-              </button>
+
+              {this.state.loading ? (
+                <button className="btn btn-secondary" type="submit" disabled>
+                  <span className="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                </button>
+              ) : (
+                <button className="btn btn-secondary" onClick={this.submitForm}>
+                  Create Account
+                </button>
+              )}
             </form>
           </div>
           {/* Customer error message, if applicable */}
-          {message && <p>{message}</p>}
+          {/* {message && <p>{message}</p>} */}
         </div>
         {/* <Footer /> */}
       </div>
