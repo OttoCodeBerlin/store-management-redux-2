@@ -35,28 +35,28 @@ export default class Profile extends Component {
 
   //Lifecycle method 1
   componentDidMount() {
-    if (!this.props.authenticated ) {
+    if (!this.props.authenticated) {
       this.props.history.push('/')
     } else {
-    axios
-      .get(process.env.REACT_APP_API_URL + '/user', {
-        headers: {
-          Authorization: localStorage.FBIdToken
-        }
-      })
-      .then(res => {
-        this.setState({
-          user: res.data.credentials
+      axios
+        .get(process.env.REACT_APP_API_URL + '/user', {
+          headers: {
+            Authorization: localStorage.FBIdToken
+          }
         })
-        return
-      })
-      .catch(err => {
-        console.log(err)
-        return
-      })
+        .then(res => {
+          this.setState({
+            user: res.data.credentials
+          })
+          return
+        })
+        .catch(err => {
+          console.log(err)
+          return
+        })
 
-    this.updateCustomerList()
-  }
+      this.updateCustomerList()
+    }
   }
 
   //Lifecycle Method 2
@@ -190,6 +190,11 @@ export default class Profile extends Component {
     localStorage.removeItem('FBIdToken')
     delete axios.defaults.headers.common['Authorization']
     this.props.history.push('/')
+  }
+
+  //Handle Edit User Data method
+  handleEdit = () => {
+    this.props.history.push('/edit')
   }
 
   //View handler for Add Customer tab
@@ -536,7 +541,11 @@ export default class Profile extends Component {
                   </li>
                 </ul>
               </div>
-              <button className="btn btn-secondary mt-3" onClick={this.handleLogout}>
+              <button className="btn btn-warning m-3" onClick={this.handleEdit}>
+                Edit User
+              </button>
+
+              <button className="btn btn-secondary m-3" onClick={this.handleLogout}>
                 Logout
               </button>
             </div>

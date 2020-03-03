@@ -17,6 +17,7 @@ import Profile from '../src/pages/Profile'
 import ThankYou from '../src/pages/ThankYou'
 import CustomerImage from '../src/pages/CustomerImage'
 import About from '../src/pages/About'
+import EditUser from '../src/pages/EditUser'
 
 let authenticated
 const token = localStorage.FBIdToken
@@ -107,6 +108,8 @@ export default class App extends Component {
       })
   }
 
+  
+
   render() {
     return (
       <div className="App">
@@ -142,11 +145,9 @@ export default class App extends Component {
                 />
               )}
             />
-            <Route
-              path="/profile"
-              render={props => <Profile {...props} user_email={this.state.email} authenticated={authenticated} />}
-            />
+            <Route path="/profile" render={props => <Profile {...props} authenticated={authenticated} />} />
             <Route path="/thankyou" component={ThankYou} />
+            <Route path="/edit" render={props => <EditUser {...props} authenticated={authenticated} />} />
             <Route path="/about" component={About} />
             <Route path="/confirm/:id" component={CustomerImage} />
           </Switch>
