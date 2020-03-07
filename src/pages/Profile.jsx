@@ -462,10 +462,7 @@ export default class Profile extends Component {
                   </div>
                   {this.state.addcustomer_loading ? (
                     <button className="btn btn-secondary mt-3" type="submit" disabled>
-                      <span className="spinner-border spinner-border-sm" role="status" aria-hidden="true">
-                        {' '}
-                        Please wait...
-                      </span>
+                      <span className="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
                     </button>
                   ) : (
                     <button type="submit" className="btn btn-secondary btn-lg mt-3">
