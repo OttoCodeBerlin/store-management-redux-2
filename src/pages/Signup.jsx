@@ -1,23 +1,65 @@
 import React, { Component } from 'react'
 import SimpleReactValidator from 'simple-react-validator'
+import axios from 'axios'
 
 export default class Signup extends Component {
   constructor(props) {
     super(props)
 
     this.state = {
-      loading: false
+      loading: false,
+      handle: '',
+      email: '',
+      password: '',
+      confirmPassword: '',
+      store_location: '',
+      role: '',
     }
+
     this.validator = new SimpleReactValidator()
+
+    this.handleInput = this.handleInput.bind(this)
+    this.handleSubmitSignup = this.handleSubmitSignup.bind(this)
+  }
+
+  //Input handler
+  handleInput = ({ target: input }) => {
+    const { name, value } = input
+    this.setState({
+      [name]: value,
+    })
+  }
+
+  //Submit data handler for Signup
+  handleSubmitSignup = (e) => {
+    if (e) e.preventDefault()
+    const userData = {
+      handle: this.state.handle,
+      email: this.state.email,
+      password: this.state.password,
+      confirmPassword: this.state.confirmPassword,
+      store_location: this.state.store_location,
+      role: this.state.role,
+    }
+    axios
+      .post(process.env.REACT_APP_API_URL + '/signup', userData)
+      .then((res) => {
+        localStorage.setItem('FBIdToken', `Bearer ${res.data.token}`)
+        window.location.href = '/profile'
+        return
+      })
+      .catch((err) => {
+        return console.error(err)
+      })
   }
 
   //Call final submit
   submitForm = () => {
     if (this.validator.allValid()) {
       this.setState({
-        loading: true
+        loading: true,
       })
-      this.props.submitHandler()
+      this.handleSubmitSignup()
     } else {
       this.validator.showMessages()
       this.forceUpdate()
@@ -25,10 +67,11 @@ export default class Signup extends Component {
   }
 
   render() {
-    const { password, confirmPassword, handle, email, store_location, role, inputHandler, submitHandler } = this.props
+    const { password, confirmPassword, handle, email, store_location, role } = this.state
+
     return (
       <div className="d-flex justify-content-center" style={{ marginTop: '80px' }}>
-        <form className="vertical-center" onSubmit={submitHandler}>
+        <form className="vertical-center" onSubmit={this.handleSubmitSignup}>
           <h5 className="title">Sign up</h5>
 
           <div className="form-group row">
@@ -41,7 +84,7 @@ export default class Signup extends Component {
                 name="handle"
                 value={handle}
                 placeholder="Select Username..."
-                onChange={inputHandler}
+                onChange={this.handleInput}
                 className="form-control"
                 id="handle"
               />
@@ -59,7 +102,7 @@ export default class Signup extends Component {
                 name="email"
                 value={email}
                 placeholder="Email"
-                onChange={inputHandler}
+                onChange={this.handleInput}
                 className="form-control"
                 id="email"
               />
@@ -77,7 +120,7 @@ export default class Signup extends Component {
                 name="password"
                 placeholder="Password..."
                 value={password}
-                onChange={inputHandler}
+                onChange={this.handleInput}
                 className="form-control"
                 id="password"
               />
@@ -95,7 +138,7 @@ export default class Signup extends Component {
                 name="confirmPassword"
                 placeholder="Confirm Password..."
                 value={confirmPassword}
-                onChange={inputHandler}
+                onChange={this.handleInput}
                 className="form-control"
                 id="confirmPassword"
               />
@@ -113,7 +156,7 @@ export default class Signup extends Component {
                 id="store_location"
                 name="store_location"
                 value={store_location}
-                onChange={inputHandler}
+                onChange={this.handleInput}
               >
                 <option value="" disabled>
                   Select...
@@ -135,7 +178,7 @@ export default class Signup extends Component {
               Role
             </label>
             <div className="col-sm-10">
-              <select className="custom-select" id="role" name="role" value={role} onChange={inputHandler}>
+              <select className="custom-select" id="role" name="role" value={role} onChange={this.handleInput}>
                 <option value="" disabled>
                   Select...
                 </option>

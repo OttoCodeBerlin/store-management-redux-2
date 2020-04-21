@@ -1,0 +1,3 @@
+export const AUTH_CHANGE = 'AUTH_CHANGE'
+
+export const LOAD_CUSTOMERS = 'LOAD_CUSTOMERS'

@@ -3,8 +3,24 @@ import ReactImageMagnify from 'react-image-magnify'
 import axios from 'axios'
 import moment from 'moment'
 import logo_sco from '../images/sustainable_fashion_o_logo.jpg'
+import { connect } from 'react-redux'
+//import jwtDecode from 'jwt-decode'
+import { authAction, fetchCustomers } from '../actions/actions'
 
-export default class Profile extends Component {
+/* const token = localStorage.FBIdToken
+
+if (token) {
+  const decodedToken = jwtDecode(token)
+  if (decodedToken.exp * 1000 < Date.now()) {
+    authAction(false)
+  } else {
+    authAction(true)
+  }
+} else {
+  authAction(false)
+} */
+
+class Profile extends Component {
   constructor(props) {
     super(props)
     this.state = {
@@ -14,11 +30,11 @@ export default class Profile extends Component {
         email: '',
         createdAt: '',
         role: '',
-        store_location: ''
+        store_location: '',
       },
       // message: null,
       customer_email: '',
-      customers: [],
+      //customers: [],
       filtered_customers: [],
       pictures: [],
       is_addcustomer_visible: true,
@@ -27,7 +43,7 @@ export default class Profile extends Component {
       is_search_unsuccessful: false,
       no_search_value: false,
       addcustomer_loading: false,
-      customerlist_loading: false
+      customerlist_loading: false,
     }
 
     this.deleteCustomer = this.deleteCustomer.bind(this)
@@ -35,36 +51,37 @@ export default class Profile extends Component {
 
   //Lifecycle method 1
   componentDidMount() {
-    if (!this.props.authenticated) {
+    /* this.props.authAction(true)
+    if (!this.props.auth.authenticated) {
       this.props.history.push('/')
-    } else {
-      axios
-        .get(process.env.REACT_APP_API_URL + '/user', {
-          headers: {
-            Authorization: localStorage.FBIdToken
-          }
+    } else { */
+    axios
+      .get(process.env.REACT_APP_API_URL + '/user', {
+        headers: {
+          Authorization: localStorage.FBIdToken,
+        },
+      })
+      .then((res) => {
+        this.setState({
+          user: res.data.credentials,
         })
-        .then(res => {
-          this.setState({
-            user: res.data.credentials
-          })
-          return
-        })
-        .catch(err => {
-          console.log(err)
-          return
-        })
+        return
+      })
+      .catch((err) => {
+        console.log(err)
+        return
+      })
 
-      this.updateCustomerList()
-    }
+    this.updateCustomerList()
+    //}
   }
 
   //Lifecycle Method 2
   componentDidUpdate(prevProps) {
     const {
       match: {
-        params: { value }
-      }
+        params: { value },
+      },
     } = this.props
     if (prevProps.match.params.value !== value) {
     }
@@ -72,24 +89,27 @@ export default class Profile extends Component {
 
   updateCustomerList = () => {
     this.setState({
-      customerlist_loading: true
+      customerlist_loading: true,
     })
-    axios
+this.props.fetchCustomers()
+    this.setState({
+      //customers: res.data,
+      customerlist_loading: false,
+    })
+    /*     axios
       .get(process.env.REACT_APP_API_URL + '/customers')
-      .then(res => {
-        this.setState({
-          customers: res.data,
-          customerlist_loading: false
-        })
+      .then((res) => {
+        
+        this.props.custAction(res.data)
         return
       })
-      .catch(err => {
+      .catch((err) => {
         this.setState({
-          customerlist_loading: false
+          customerlist_loading: false,
         })
         console.error(err)
         return
-      })
+      }) */
   }
 
   //Delete a customer in database and update view
@@ -98,13 +118,13 @@ export default class Profile extends Component {
     axios
       .delete(process.env.REACT_APP_API_URL + '/customer/' + id, {
         headers: {
-          Authorization: localStorage.FBIdToken
-        }
+          Authorization: localStorage.FBIdToken,
+        },
       })
-      .then(res => {
+      .then((res) => {
         return this.updateCustomerList()
       })
-      .catch(err => {
+      .catch((err) => {
         return console.error(err)
       })
   }
@@ -118,15 +138,15 @@ export default class Profile extends Component {
         { data: '' },
         {
           headers: {
-            Authorization: localStorage.FBIdToken
-          }
+            Authorization: localStorage.FBIdToken,
+          },
         }
       )
-      .then(res => {
+      .then((res) => {
         alert('Confirmation email sent to customer.')
         this.updateCustomerList()
       })
-      .catch(err => {
+      .catch((err) => {
         return console.error(err)
       })
   }
@@ -135,15 +155,15 @@ export default class Profile extends Component {
   handleInput = ({ target: input }) => {
     const { value } = input
     this.setState({
-      customer_email: value
+      customer_email: value,
     })
   }
 
   //Submit handler for customer email input
-  handleSubmit = e => {
+  handleSubmit = (e) => {
     if (e) e.preventDefault()
     this.setState({
-      addcustomer_loading: true
+      addcustomer_loading: true,
     })
     axios
       .post(
@@ -151,15 +171,15 @@ export default class Profile extends Component {
         { email: this.state.customer_email },
         {
           headers: {
-            Authorization: localStorage.FBIdToken
-          }
+            Authorization: localStorage.FBIdToken,
+          },
         }
       )
-      .then(res => {
+      .then((res) => {
         alert('Added')
         this.resetForm()
         this.setState({
-          addcustomer_loading: false
+          addcustomer_loading: false,
         })
         this.updateCustomerList()
         // this.props.history.push('/profile')
@@ -167,9 +187,9 @@ export default class Profile extends Component {
         // axios.defaults.headers.common['Authorization']= `Bearer ${res.data.token}`
         // this.props.history.push('/profile')
       })
-      .catch(err => {
+      .catch((err) => {
         this.setState({
-          addcustomer_loading: false
+          addcustomer_loading: false,
         })
         console.error(err)
       })
@@ -199,41 +219,41 @@ export default class Profile extends Component {
 
   //View handler for Add Customer tab
   click_addcustomer = () => {
-    this.setState(prevState => ({
+    this.setState((prevState) => ({
       is_addcustomer_visible: true,
       is_customerlist_visible: false,
-      is_useraccount_visible: false
+      is_useraccount_visible: false,
     }))
   }
 
   //View handler for Customer List tab
   click_customerlist = () => {
-    this.setState(prevState => ({
+    this.setState((prevState) => ({
       is_addcustomer_visible: false,
       is_customerlist_visible: true,
-      is_useraccount_visible: false
+      is_useraccount_visible: false,
     }))
   }
 
   //View handler for User Account tab
   click_useraccount = () => {
-    this.setState(prevState => ({
+    this.setState((prevState) => ({
       is_addcustomer_visible: false,
       is_customerlist_visible: false,
-      is_useraccount_visible: true
+      is_useraccount_visible: true,
     }))
   }
 
   //Filter method for customer list
-  filterCustomers = e => {
+  filterCustomers = (e) => {
     this.state.no_search_value && this.state.filtered_customers.length === 0
       ? this.setState({ is_search_unsuccessful: true })
       : this.setState({ is_search_unsuccessful: false })
     const { value } = e.target
     value.length > 0 ? this.setState({ no_search_value: true }) : this.setState({ no_search_value: false })
-    const { customers } = this.state
+    const { customers } = this.props.customers
     const query = value.toLowerCase()
-    const filtered_customers = customers.filter(customer => {
+    const filtered_customers = customers.filter((customer) => {
       if (customer.last_name) {
         return customer.last_name.toLowerCase().includes(query)
       }
@@ -248,7 +268,7 @@ export default class Profile extends Component {
     const { customer_email, user } = this.state
     //Show original customer list if search field is empty, and filtered list if search is in place
     this.state.filtered_customers.length === 0 && !this.state.no_search_value
-      ? (customer_group = this.state.customers)
+      ? (customer_group = this.props.customers.customers)
       : (customer_group = this.state.filtered_customers)
 
     //FILTERED CUSTOMERS MAPPING LIST
@@ -299,15 +319,15 @@ export default class Profile extends Component {
                       alt: 'Customer Image One',
                       width: 128,
                       height: 96,
-                      src: customer.customerImage_1
+                      src: customer.customerImage_1,
                     },
                     largeImage: {
                       src: customer.customerImage_1,
                       width: 640,
                       height: 480,
                       enlargedImageContainerDimensions: { width: '200%', height: '200%' },
-                      enlargedImagePosition: 'over'
-                    }
+                      enlargedImagePosition: 'over',
+                    },
                   }}
                   className="m-1"
                 />
@@ -319,15 +339,15 @@ export default class Profile extends Component {
                       alt: 'Customer Image Two',
                       width: 128,
                       height: 96,
-                      src: customer.customerImage_2
+                      src: customer.customerImage_2,
                     },
                     largeImage: {
                       src: customer.customerImage_2,
                       width: 640,
                       height: 480,
                       enlargedImageContainerDimensions: { width: '200%', height: '200%' },
-                      enlargedImagePosition: 'over'
-                    }
+                      enlargedImagePosition: 'over',
+                    },
                   }}
                   className="m-1"
                 />
@@ -359,7 +379,7 @@ export default class Profile extends Component {
             <button
               className="btn btn-danger btn-sm m-2"
               type="button"
-              onClick={e => {
+              onClick={(e) => {
                 if (window.confirm('You are going to delete the customer data. Are you sure?')) {
                   this.deleteCustomer(customer.customerId, e)
                 }
@@ -370,7 +390,7 @@ export default class Profile extends Component {
             <button
               className="btn btn-warning btn-sm m-2"
               type="button"
-              onClick={e => {
+              onClick={(e) => {
                 if (
                   window.confirm('You are going to send an email to the customer to request new data. Are you sure?')
                 ) {
@@ -554,3 +574,14 @@ export default class Profile extends Component {
     )
   }
 }
+
+const mapStateToProps = (state) => ({
+  ...state,
+})
+
+const mapDispatchToProps = {
+  authAction,
+  fetchCustomers,
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(Profile)

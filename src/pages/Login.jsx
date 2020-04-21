@@ -1,25 +1,59 @@
 import React, { Component } from 'react'
 import { Link } from 'react-router-dom'
+import axios from 'axios'
+import { connect } from 'react-redux'
+import { authAction } from '../actions/actions'
 
-export default class Login extends Component {
+class Login extends Component {
   constructor(props) {
     super(props)
     this.state = {
-      loading: false
+      loading: false,
+      email: '',
+      password: '',
     }
+  }
+
+  //Input handler
+  handleInput = ({ target: input }) => {
+    const { name, value } = input
+    this.setState({
+      [name]: value,
+    })
+  }
+
+  //Submit data handler for Login
+  handleSubmitLogin = (e) => {
+    if (e) e.preventDefault()
+    const userData = {
+      email: this.state.email,
+      password: this.state.password,
+    }
+    axios
+      .post(process.env.REACT_APP_API_URL + '/login', userData)
+      .then((res) => {
+        localStorage.setItem('FBIdToken', `Bearer ${res.data.token}`)
+        this.props.authAction(true)
+        window.location.href = '/profile'
+        return
+      })
+      .catch((err) => {
+        return console.error(err)
+      })
   }
 
   submitForm = () => {
     this.setState({
-      loading: true
+      loading: true,
     })
-    this.props.submitHandler()
+    this.handleSubmitLogin()
   }
 
   render() {
+    console.log(this.props)
     return (
       <div className="d-flex justify-content-center" style={{ marginTop: '80px' }}>
-        <form onSubmit={this.props.submitHandler}>
+        <form onSubmit={this.handleSubmitLogin}>
           <div className="form-group row">
             <label className="col-sm-3 col-form-label" htmlFor="email">
               Email
@@ -30,8 +64,8 @@ export default class Login extends Component {
                 className="form-control"
                 id="email"
                 name="email"
-                value={this.props.email}
-                onChange={this.props.inputHandler}
+                value={this.state.email}
+                onChange={this.handleInput}
               />
             </div>
           </div>
@@ -46,8 +80,8 @@ export default class Login extends Component {
                 className="form-control"
                 id="password"
                 name="password"
-                value={this.props.password}
-                onChange={this.props.inputHandler}
+                value={this.state.password}
+                onChange={this.handleInput}
               />
             </div>
           </div>
@@ -70,3 +104,13 @@ export default class Login extends Component {
     )
   }
 }
+
+const mapStateToProps = (state) => ({
+  ...state,
+})
+
+const mapDispatchToProps = {
+  authAction,
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(Login)

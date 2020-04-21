@@ -1,8 +1,9 @@
 import React, { Component } from 'react'
 import SimpleReactValidator from 'simple-react-validator'
 import axios from 'axios'
+import { connect } from 'react-redux'
 
-export default class Signup extends Component {
+class EditUser extends Component {
   constructor(props) {
     super(props)
 
@@ -13,7 +14,7 @@ export default class Signup extends Component {
       email: '',
       createdAt: '',
       role: '',
-      store_location: ''
+      store_location: '',
     }
 
     this.handleInput = this.handleInput.bind(this)
@@ -22,25 +23,25 @@ export default class Signup extends Component {
   }
 
   componentDidMount() {
-    if (!this.props.authenticated) {
+    if (!this.props.auth.authenticated) {
       this.props.history.push('/')
     } else {
       axios
         .get(process.env.REACT_APP_API_URL + '/user', {
           headers: {
-            Authorization: localStorage.FBIdToken
-          }
+            Authorization: localStorage.FBIdToken,
+          },
         })
-        .then(res => {
+        .then((res) => {
           this.setState({
             handle: res.data.credentials.handle,
             email: res.data.credentials.email,
             store_location: res.data.credentials.store_location,
-            role: res.data.credentials.role
+            role: res.data.credentials.role,
           })
           return
         })
-        .catch(err => {
+        .catch((err) => {
           console.log(err)
           return
         })
@@ -51,7 +52,7 @@ export default class Signup extends Component {
   handleInput = ({ target: input }) => {
     const { name, value } = input
     this.setState({
-      [name]: value
+      [name]: value,
     })
   }
 
@@ -59,7 +60,7 @@ export default class Signup extends Component {
   submitForm = () => {
     if (this.validator.allValid()) {
       this.setState({
-        loading: true
+        loading: true,
       })
       this.handleSubmit()
     } else {
@@ -72,27 +73,27 @@ export default class Signup extends Component {
     this.props.history.push('/profile')
   }
 
-  handleSubmit = e => {
+  handleSubmit = (e) => {
     if (e) e.preventDefault()
     const userData = {
       handle: this.state.handle,
       email: this.state.email,
       store_location: this.state.store_location,
-      role: this.state.role
+      role: this.state.role,
     }
     axios
       .post(process.env.REACT_APP_API_URL + '/user', userData, {
         headers: {
-          Authorization: localStorage.FBIdToken
-        }
+          Authorization: localStorage.FBIdToken,
+        },
       })
-      .then(res => {
+      .then((res) => {
         window.location.href = '/profile'
         return
       })
-      .catch(err => {
+      .catch((err) => {
         this.setState({
-          loading: false
+          loading: false,
         })
         return console.error(err)
       })
@@ -230,3 +231,9 @@ export default class Signup extends Component {
     )
   }
 }
+
+const mapStateToProps = (state) => ({
+  ...state,
+})
+
+export default connect(mapStateToProps)(EditUser)
