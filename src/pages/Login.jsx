@@ -1,8 +1,7 @@
 import React, { Component } from 'react'
 import { Link } from 'react-router-dom'
-import axios from 'axios'
 import { connect } from 'react-redux'
-import { authAction } from '../actions/actions'
+import { authAction, loginUser } from '../actions/actions'
 
 class Login extends Component {
   constructor(props) {
@@ -29,17 +28,10 @@ class Login extends Component {
       email: this.state.email,
       password: this.state.password,
     }
-    axios
-      .post(process.env.REACT_APP_API_URL + '/login', userData)
-      .then((res) => {
-        localStorage.setItem('FBIdToken', `Bearer ${res.data.token}`)
-        this.props.authAction(true)
-        window.location.href = '/profile'
-        return
-      })
-      .catch((err) => {
-        return console.error(err)
-      })
+
+    this.props.loginUser(userData)
+
+    window.location.href = '/profile'
   }
 
   submitForm = () => {
@@ -50,7 +42,6 @@ class Login extends Component {
   }
 
   render() {
-    console.log(this.props)
     return (
       <div className="d-flex justify-content-center" style={{ marginTop: '80px' }}>
         <form onSubmit={this.handleSubmitLogin}>
@@ -111,6 +102,7 @@ const mapStateToProps = (state) => ({
 
 const mapDispatchToProps = {
   authAction,
+  loginUser,
 }
 
 export default connect(mapStateToProps, mapDispatchToProps)(Login)

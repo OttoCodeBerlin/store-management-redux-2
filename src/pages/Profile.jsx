@@ -91,7 +91,7 @@ class Profile extends Component {
     this.setState({
       customerlist_loading: true,
     })
-this.props.fetchCustomers()
+    this.props.fetchCustomers()
     this.setState({
       //customers: res.data,
       customerlist_loading: false,
