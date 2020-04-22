@@ -1,7 +1,7 @@
 import { combineReducers } from 'redux'
-import { AUTH_CHANGE, LOAD_CUSTOMERS, LOGIN } from '../actions/actionTypes'
+import { AUTH_CHANGE, LOAD_CUSTOMERS, LOGIN, SET_USER } from '../actions/actionTypes'
 
-const authReducer = (state = { authenticated: true }, action) => {
+const authReducer = (state = { authenticated: false }, action) => {
   switch (action.type) {
     case AUTH_CHANGE: {
       return { ...state, authenticated: action.payload }
@@ -21,20 +21,43 @@ const customersReducer = (state = { customers: [] }, action) => {
   }
 }
 
-const userReducer=(state ={}, action)=> {
+const loginReducer = (state = {}, action) => {
   switch (action.type) {
-    case LOGIN:  {
-      return {...state}
+    case LOGIN: {
+      return { ...state }
     }
-    default: 
-    return state
+    default:
+      return state
+  }
+}
+
+const userReducer = (
+  state = {
+    user: {
+      handle: '',
+      userId: '',
+      email: '',
+      createdAt: '',
+      role: '',
+      store_location: '',
+    },
+  },
+  action
+) => {
+  switch (action.type) {
+    case SET_USER: {
+      return { ...state, user: action.payload }
+    }
+    default:
+      return state
   }
 }
 
 const rootReducer = combineReducers({
   auth: authReducer,
   customers: customersReducer,
-  user: userReducer
+  login: loginReducer,
+  user: userReducer,
 })
 
 export default rootReducer

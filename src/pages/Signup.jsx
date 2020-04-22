@@ -1,8 +1,9 @@
 import React, { Component } from 'react'
 import SimpleReactValidator from 'simple-react-validator'
-import axios from 'axios'
+import { connect } from 'react-redux'
+import { authAction, signupUser } from '../actions/actions'
 
-export default class Signup extends Component {
+class Signup extends Component {
   constructor(props) {
     super(props)
 
@@ -41,16 +42,7 @@ export default class Signup extends Component {
       store_location: this.state.store_location,
       role: this.state.role,
     }
-    axios
-      .post(process.env.REACT_APP_API_URL + '/signup', userData)
-      .then((res) => {
-        localStorage.setItem('FBIdToken', `Bearer ${res.data.token}`)
-        window.location.href = '/profile'
-        return
-      })
-      .catch((err) => {
-        return console.error(err)
-      })
+    this.props.signupUser(userData)
   }
 
   //Call final submit
@@ -204,3 +196,15 @@ export default class Signup extends Component {
     )
   }
 }
+
+
+const mapStateToProps = (state) => ({
+  ...state,
+})
+
+const mapDispatchToProps = {
+  authAction,
+  signupUser,
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(Signup)

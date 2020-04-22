@@ -1,5 +1,6 @@
 import axios from 'axios'
-import { AUTH_CHANGE, LOAD_CUSTOMERS, LOGIN } from './actionTypes'
+
+import { AUTH_CHANGE, LOAD_CUSTOMERS, SET_USER } from './actionTypes'
 
 export const authAction = (payload) => {
   return {
@@ -10,7 +11,7 @@ export const authAction = (payload) => {
 
 export const fetchCustomers = () => {
   return (dispatch) => {
-    return axios
+    axios
       .get(process.env.REACT_APP_API_URL + '/customers')
       .then((res) => {
         dispatch(setCustomers(res.data))
@@ -22,20 +23,54 @@ export const fetchCustomers = () => {
 }
 
 export const loginUser = (userData) => {
-  console.log(userData)
   return (dispatch) => {
     axios
       .post(process.env.REACT_APP_API_URL + '/login', userData)
       .then((res) => {
-        console.log(res)
         localStorage.setItem('FBIdToken', `Bearer ${res.data.token}`)
-        dispatch(login(true))
-        dispatch({ type: LOGIN, userData: res.data })
-        // this.props.authAction(true)
+        //dispatch(login(true))
+        dispatch(authAction(true))
+        window.location.href = '/profile'
       })
       .catch((err) => {
         dispatch(authAction(false))
         console.error(err)
+      })
+  }
+}
+
+export const signupUser = (userData) => {
+  return (dispatch) => {
+    axios
+      .post(process.env.REACT_APP_API_URL + '/signup', userData)
+      .then((res) => {
+        localStorage.setItem('FBIdToken', `Bearer ${res.data.token}`)
+        //dispatch(login(true))
+        dispatch(authAction(true))
+        window.location.href = '/profile'
+      })
+      .catch((err) => {
+        dispatch(authAction(false))
+        console.error(err)
+      })
+  }
+}
+
+export const getUser = () => {
+  return (dispatch) => {
+    axios
+      .get(process.env.REACT_APP_API_URL + '/user', {
+        headers: {
+          Authorization: localStorage.FBIdToken,
+        },
+      })
+      .then((res) => {
+        dispatch(setUser(res.data))
+        dispatch(authAction(true))
+      })
+      .catch((err) => {
+        console.log(err)
+        //this.props.history.push('/')
       })
   }
 }
@@ -47,9 +82,24 @@ export const setCustomers = (data) => {
   }
 }
 
-export const login = (data) => {
+export const setUser = (data) => {
+  return {
+    type: SET_USER,
+    payload: data,
+  }
+}
+
+/* export const login = (data) => {
   return {
     type: LOGIN,
     payload: data,
+  }
+} */
+
+export const logout = () => {
+  return (dispatch) => {
+    localStorage.removeItem('FBIdToken')
+    delete axios.defaults.headers.common['Authorization']
+    dispatch(authAction(false))
   }
 }

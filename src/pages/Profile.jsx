@@ -4,34 +4,14 @@ import axios from 'axios'
 import moment from 'moment'
 import logo_sco from '../images/sustainable_fashion_o_logo.jpg'
 import { connect } from 'react-redux'
-//import jwtDecode from 'jwt-decode'
-import { authAction, fetchCustomers } from '../actions/actions'
+import { authAction, fetchCustomers, getUser, logout } from '../actions/actions'
 
-/* const token = localStorage.FBIdToken
 
-if (token) {
-  const decodedToken = jwtDecode(token)
-  if (decodedToken.exp * 1000 < Date.now()) {
-    authAction(false)
-  } else {
-    authAction(true)
-  }
-} else {
-  authAction(false)
-} */
 
 class Profile extends Component {
   constructor(props) {
     super(props)
     this.state = {
-      user: {
-        handle: '',
-        userId: '',
-        email: '',
-        createdAt: '',
-        role: '',
-        store_location: '',
-      },
       // message: null,
       customer_email: '',
       //customers: [],
@@ -51,29 +31,8 @@ class Profile extends Component {
 
   //Lifecycle method 1
   componentDidMount() {
-    /* this.props.authAction(true)
-    if (!this.props.auth.authenticated) {
-      this.props.history.push('/')
-    } else { */
-    axios
-      .get(process.env.REACT_APP_API_URL + '/user', {
-        headers: {
-          Authorization: localStorage.FBIdToken,
-        },
-      })
-      .then((res) => {
-        this.setState({
-          user: res.data.credentials,
-        })
-        return
-      })
-      .catch((err) => {
-        console.log(err)
-        return
-      })
-
+    //this.props.getUser()
     this.updateCustomerList()
-    //}
   }
 
   //Lifecycle Method 2
@@ -93,23 +52,8 @@ class Profile extends Component {
     })
     this.props.fetchCustomers()
     this.setState({
-      //customers: res.data,
       customerlist_loading: false,
     })
-    /*     axios
-      .get(process.env.REACT_APP_API_URL + '/customers')
-      .then((res) => {
-        
-        this.props.custAction(res.data)
-        return
-      })
-      .catch((err) => {
-        this.setState({
-          customerlist_loading: false,
-        })
-        console.error(err)
-        return
-      }) */
   }
 
   //Delete a customer in database and update view
@@ -206,9 +150,9 @@ class Profile extends Component {
   }
 
   //Auth logout method
-  handleLogout = () => {
-    localStorage.removeItem('FBIdToken')
-    delete axios.defaults.headers.common['Authorization']
+  handleLogout = (e) => {
+    e.preventDefault()
+    this.props.logout()
     this.props.history.push('/')
   }
 
@@ -265,7 +209,12 @@ class Profile extends Component {
   //RENDER VIEW
   render() {
     let customer_group
-    const { customer_email, user } = this.state
+    const { customer_email } = this.state
+    let user = {}
+    this.props.user.user.credentials !== undefined
+      ? (user = this.props.user.user.credentials)
+      : ({ user } = this.props.user)
+
     //Show original customer list if search field is empty, and filtered list if search is in place
     this.state.filtered_customers.length === 0 && !this.state.no_search_value
       ? (customer_group = this.props.customers.customers)
@@ -298,7 +247,7 @@ class Profile extends Component {
             <small>{customer.email}</small>
           </td>
 
-          {customer.userHandle === this.state.user.handle ? (
+          {customer.userHandle === user.handle ? (
             <td className="align-middle p-0" style={{ backgroundColor: 'lightgrey' }}>
               <small>
                 {customer.userHandle} <br /> <strong>(current)</strong>
@@ -582,6 +531,8 @@ const mapStateToProps = (state) => ({
 const mapDispatchToProps = {
   authAction,
   fetchCustomers,
+  getUser,
+  logout,
 }
 
 export default connect(mapStateToProps, mapDispatchToProps)(Profile)
